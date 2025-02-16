@@ -1,0 +1,40 @@
+
+services:
+  database:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+        - "5050:80"
+
+  backend:
+    build: ./backend
+    container_name: backend_service
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydatabase
+    ports:
+      - "80:80"
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_service
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
