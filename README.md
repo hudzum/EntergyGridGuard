@@ -3,7 +3,7 @@
 Hello team, I just wanted to give a brief rundown on how to setup the project for those who are new to using docker.
 
 1. Make sure you have the docker application installed
-2. Sign up / Sign in
+2. Sign up / Sign in to Docker
 3. Clone the Github Repo to your local workspace
 4. CD into the root of the project folder
 5. Run "yarn install" (This is our package manager very similar to npm)
