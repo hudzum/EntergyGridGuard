@@ -1,4 +1,4 @@
-##How to set up project
+## How to set up project
 
 Hello team, I just wanted to give a brief rundown on how to setup the project for those who are new to using docker.
 
