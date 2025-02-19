@@ -26,7 +26,7 @@ services:
     container_name: backend_service
     restart: always
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydatabase
+      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydatabase # I directly added in the uri here. Need to figure out how to not.
     ports:
       - "80:80"
 

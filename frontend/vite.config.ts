@@ -10,6 +10,9 @@ export default defineConfig({
     },
     host: true, // Here
     strictPort: true,
-    port: 3000, 
+    port: 3000,
+    proxy: {
+        '/api': 'http://localhost:80' // Proxy API requests to FastAPI
+        }
   }
 })
