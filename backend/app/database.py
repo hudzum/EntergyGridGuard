@@ -1,10 +1,10 @@
 import os
-from dotenv import load_dotenv
+import json
 from datetime import datetime, timezone
-from sqlalchemy import create_engine, Column, Integer, LargeBinary, String, DateTime, JSON
+from sqlalchemy import create_engine, Column, Integer, LargeBinary, JSON, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import json
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -16,7 +16,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class Picture(Base):
     __tablename__ = "pictures"
-
     id = Column(Integer, primary_key=True, index=True)
     picture = Column(LargeBinary)
     components = Column(JSON, default={})
@@ -31,24 +30,24 @@ def get_db():
     finally:
         db.close()
 
-
-def save_image_to_db(image_data: bytes):
-    """Saves image binary data to the database with empty 'components' and current timestamp."""
-    db = next(get_db())  # Get the database session
-
+def save_image_to_db(image_data: bytes, components: dict = None):
+    """
+    Saves image binary data and associated components to the database.
+    Returns the inserted record's ID, or None if an error occurs.
+    """
+    db = next(get_db())
+    if components is None:
+        components = {}
     try:
-        # Create a new Picture object (Leave components as empty for initial testing)
-        picture = Picture(picture=image_data, components=json.dumps({}), time_created=datetime.now(timezone.utc))
-
-        # Add the new object to the session
+        picture = Picture(
+            picture=image_data,
+            components=components,
+            time_created=datetime.now(timezone.utc)
+        )
         db.add(picture)
-
-        # Commit the transaction and return the id
         db.commit()
         db.refresh(picture)
-
         return picture.id
-
     except Exception as e:
         db.rollback()
         print("Database Error:", e)
