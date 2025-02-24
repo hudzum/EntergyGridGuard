@@ -5,9 +5,9 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: test_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
 
@@ -26,7 +26,7 @@ services:
     container_name: backend_service
     restart: always
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@postgres:5432/mydatabase # I directly added in the uri here. Need to figure out how to not.
+      DATABASE_URL: ${DATABASE_URL} # I directly added in the uri here. Need to figure out how to not.
     ports:
       - "80:80"
 

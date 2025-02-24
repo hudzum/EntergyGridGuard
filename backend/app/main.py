@@ -2,8 +2,8 @@ import os
 import datetime
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from database import save_image_to_db  # Make sure database.py is in the same folder or in the Python path
-from imaging import send_image, parse_response
+from app.database import save_image_to_db  # Make sure database.py is in the same folder or in the Python path
+from app.imaging import send_image, parse_response
 
 app = FastAPI()
 
