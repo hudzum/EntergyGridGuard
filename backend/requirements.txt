@@ -3,3 +3,7 @@ pydantic>=2.7.0,<3.0.0
 psycopg2
 sqlalchemy
 python-dotenv
+sshtunnel
+requests
+pillow
+piexif
