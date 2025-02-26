@@ -133,11 +133,7 @@ async def upload_image(file: UploadFile = File(...)):
 
         # Convert the image to RGB mode
         image = image.convert("RGB")
-
         timestamp = datetime.datetime.now().timestamp()
-        # Extract the file extension
-        # file_ext = os.path.splitext(file.filename)[1]  # png, jpeg, etc. (Primarily want it to be jpeg)
-        # file_path = os.path.join(UPLOAD_DIR, f"{datetime.datetime.now().timestamp()}{file_ext}")
 
         # Convert to jpeg (Assuming there are still issues with the llm when it is not jpeg)
         file_path = os.path.join(UPLOAD_DIR, f"{timestamp}.jpeg")
@@ -147,24 +143,25 @@ async def upload_image(file: UploadFile = File(...)):
         else:
             image.save(file_path, "JPEG", quality=95)  # No metadata if none exists
 
-        # with open(file_path, "wb") as f:
-            # f.write(image_data)
+        #with open(file_path, "wb") as f:
+             #f.write(image_data)
 
         print(f"Image saved to: {os.path.abspath(file_path)}")
 
-        # Add this to components
+        # Add this to components later
         gps_data = extract_lat_long(file_path)
         print("GPS:", gps_data)
 
-        llm_response = send_image(file_path)  # Send the image to the LLM API via SSH tunnel
-        components = parse_response(llm_response)  # Parse the response into valid JSON format
-        print("Parsed Components:", components)
+
+        #llm_response = send_image(file_path)  # Send the image to the LLM API via SSH tunnel
+        #components = parse_response(llm_response)  # Parse the response into valid JSON format
+        #print("Parsed Components:", components)
 
         # Convert the saved JPEG back to binary data for DB storage
         with open(file_path, "rb") as f:
             jpeg_data = f.read()
 
-        image_id = save_image_to_db(jpeg_data, components)
+        image_id = save_image_to_db(jpeg_data) # image_id = save_image_to_db(jpeg_data, components)
 
         if image_id:
             return {"message": "Image uploaded successfully", "image_id": image_id}
