@@ -25,7 +25,7 @@ LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-API_ENDPOINT = "/api/analyze-image/"
+API_ENDPOINT = "/analyze-image/"
 
 def extract_lat_long(image_path):
     """
@@ -87,8 +87,7 @@ def send_image(image_path):
         local_port = tunnel.local_bind_port
         api_url = f"http://0.0.0.0:{local_port}{API_ENDPOINT}"
         print(f"Tunnel established. Using API URL: {api_url}")
-
-        # Send the image to the API.
+    # Send the image to the API.
         with open(image_path, "rb") as img:
             files = {"file": img}
             response = requests.post(api_url, files=files)
@@ -152,16 +151,14 @@ async def upload_image(file: UploadFile = File(...)):
         gps_data = extract_lat_long(file_path)
         print("GPS:", gps_data)
 
-
-        #llm_response = send_image(file_path)  # Send the image to the LLM API via SSH tunnel
-        #components = parse_response(llm_response)  # Parse the response into valid JSON format
-        #print("Parsed Components:", components)
+        llm_response = send_image(file_path)  # Send the image to the LLM API via SSH tunnel
+        components = parse_response(llm_response)  # Parse the response into valid JSON format
 
         # Convert the saved JPEG back to binary data for DB storage
         with open(file_path, "rb") as f:
             jpeg_data = f.read()
 
-        image_id = save_image_to_db(jpeg_data) # image_id = save_image_to_db(jpeg_data, components)
+        image_id = save_image_to_db(jpeg_data, components)
 
         if image_id:
             return {"message": "Image uploaded successfully", "image_id": image_id}
