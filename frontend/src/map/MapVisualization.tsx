@@ -8,6 +8,7 @@ import line2 from '../assets/line 2.png';
 import line3 from '../assets/line 3.png';
 
 import {SearchBox} from '@mapbox/search-js-react';
+import '../App.css';
 
 import * as THREE from "three";
 
@@ -211,7 +212,7 @@ export const MapComponent: React.FC<{setSidebar: React.Dispatch<boolean>}> = ({s
             }}
         >
             <div ref={mapContainerRef} style={{height: '100%'}} onClick={() => setSidebar(true)} />
-            <div style={{position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', width: 'clamp(200px, 50%, 90%)'}}>
+            <div style={{position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', width: 'min(90%, 400px)'}}>
                 <SearchBox
                     accessToken={MAP_BOX_TOKEN}
                     map={map.current}

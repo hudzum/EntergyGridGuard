@@ -9,8 +9,9 @@ export const AttributionBox: React.FC = () => {
                 transformOrigin: '180px -157px',
             }),
             borderRadius: '10px 10px 0 0',
+            border: '1px solid white',
             position: 'fixed', left: 0, bottom: 0, zIndex: 10, display: 'flex', flexDirection: 'column', background: 'black', color: 'white', fontWeight: 'bold', width: '400px', height: '200px', overflow: 'scroll'}}>
-            <div onClick={()=>setShowAttr(a=>!a)} style={{cursor:'pointer', width: '100%', background: 'white', color: 'black', display: 'grid', gridTemplateColumns: '1fr min-content', placeItems: 'center'}}><span>Attribution</span>{showAttr && <button style={{background: '#FD2858', borderRadius: 0}}>X</button>}</div>
+            <div onClick={()=>setShowAttr(a=>!a)} style={{cursor:'pointer', width: '100%', background: 'white', color: 'black', display: 'grid', gridTemplateColumns: '1fr min-content', placeItems: 'center'}}><span>Attribution</span>{showAttr && <button style={{background: '#FD2858', borderRadius: 0, padding: '0 10px'}}>X</button>}</div>
 
             {showAttr && (
                 <div style={{padding: 10, display: 'flex', flexDirection: 'column'}}>
