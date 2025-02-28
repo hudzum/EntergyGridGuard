@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mapbox/search-js-react": "^1.0.0",
+    "mapbox-gl": "^3.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
