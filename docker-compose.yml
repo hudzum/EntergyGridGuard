@@ -25,12 +25,12 @@ services:
     env_file:
       - .env
     volumes:
-      - ~/.ssh/GIZMO_SSH_KEY_samuel_goodwin:/root/.ssh/GIZMO_SSH_KEY_samuel_goodwin:ro
+      - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/app/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
     build: ./backend
     container_name: backend_service
     restart: always
     environment:
-      DATABASE_URL: ${DATABASE_URL} # I directly added in the uri here. Need to figure out how to not.
+      DATABASE_URL: ${DATABASE_URL}
     ports:
       - "80:80"
 

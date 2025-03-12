@@ -23,7 +23,7 @@ export default function UploadResult ({ imageDetails, imageSrc}) {
   return (
     
     <div className="flex flex-col items-center justify-center space-y-6 p-8">
-      <ImageDown className="h-24 w-24 text-violet-700" />
+     
       
       <div className="text-lg font-semibold">
         <h2 className="text-2xl font-bold text-center mb-4">Image {imageDetails.id} Details</h2>
@@ -67,11 +67,10 @@ export default function UploadResult ({ imageDetails, imageSrc}) {
       
       <p className="text-sm text-gray-500">
         <strong>Created At:</strong> {new Date(imageDetails.time_created).toLocaleString()}
+        
       </p>
       
-      <Button className="bg-rose-500 hover:bg-rose-600 text-white">
-        Download Files
-      </Button>
+      
     </div>
   );
 }

@@ -35,7 +35,6 @@ export default function UploadPage() {
         <img src={statusImages[status]} alt="Status" className="w-150" />
 
         <Card className="bg-zinc-50 m-19 p-10 border-violet-700 border-l-5 w-200">
-          Goo Goo Gaa Gaa 5
           {status === "upload" && (
             <>
               {" "}

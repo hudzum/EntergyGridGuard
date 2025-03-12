@@ -24,12 +24,12 @@ export function Navbar() {
           <img src="./Entergy.png" alt="Object Detected Pole" className = "h-[100px]"/> 
           </NavLink>
           </div>
-          <div className ="text-black font-bold flex items-center space-x-6">
+          <div className ="text-black font-bold flex items-center space-x-10">
           <NavigationMenu >
-            <NavigationMenuList>
+            <NavigationMenuList className="space-x-8">
               <NavigationMenuItem>
                 <NavLink to="/map">
-                  Image Dets 
+                  Map 
                 </NavLink>
               </NavigationMenuItem>
 

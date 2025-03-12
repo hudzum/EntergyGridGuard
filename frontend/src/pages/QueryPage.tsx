@@ -1,217 +1,144 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { Navbar } from '@/components/NavBar';
+
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Navbar } from "@/components/NavBar";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DataTable } from '@/components/tableFilterComps/data-table';
+import { columns } from '@/components/tableFilterComps/columns';
 
-export default function QueryPage() {
-  const [filters, setFilters] = useState({
-    assetType: "",
-    condition: "",
-    minPrice: "",
-    maxPrice: "",
-    location: [],
-  });
 
-  // Asset Types
-  const assetTypes = ["Transformers", "Capcitors", "Insulators", "Wiring"];
 
-  // Conditions
-  const conditions = ["New", "Need Help", "Broken"];
 
-  // Location Options
-  const locations = [
-    { label: "Within 15 miles", value: "15" },
-    { label: "Within 30 miles", value: "30" },
-    { label: "Within 60 miles", value: "60" },
-  ];
+const QueryPage = () => {
+  type Pole ={
+    id: number,
+    status: string,
+    date: string,
+    components:{},
+}
+  const [poles, setPoles] = useState<Pole[]>([]);
+  //const [poles, setPoles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Handle Select Change
-  const handleSelectChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
+  //Determines an overall condition of the pole
+  function getOverallCondition(components) {
+    const conditionCounts = { bad: 0, good: 0, unknown: 0 };
 
-  // Handle Input Change
-  const handleInputChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  // Handle Checkbox Change
-  const handleCheckboxChange = (value) => {
-    setFilters((prev) => {
-      const updatedLocations = prev.location.includes(value)
-        ? prev.location.filter((loc) => loc !== value)
-        : [...prev.location, value];
-
-      return { ...prev, location: updatedLocations };
-    });
-  };
-
-  // Handle Search
-  const handleSearch = () => {
-    console.log("Filters Applied:", filters);
-    const element = document.querySelector("#results");
-    if (element) {
-      element.className="inline" 
+    for (const key in components) {
+        if (components[key].condition in conditionCounts) {
+            conditionCounts[components[key].condition]++;
+        }
     }
-    // Perform API search or filtering logic here
-  };
 
+    // Determine the condition with the highest count
+    let overallCondition = Object.keys(conditionCounts).reduce((a, b) => 
+        conditionCounts[a] > conditionCounts[b] ? a : b
+    );
+
+    return overallCondition;
+}
+  // Fetching Data
+  useEffect(() => {
+    const fetchImagesMetadata = async () => {
+      console.log("Attempting to fetch Pole Data ")
+      setLoading(true);
+      try {
+        const response = await fetch(`http://localhost:80/api/images-meta`);
+        if (response.ok) {
+          const data = await response.json();
+
+
+          if (data.images && data.images.length > 0) {
+
+            console.log("Original Array")
+            console.log(data.images);
+
+            const polesWithComponents = (data.images).filter((pole) => 
+            Object.keys(pole.components).length > 0 && pole.components != '{}')
+            console.log("No Blank Components")
+            console.log(polesWithComponents)
+
+            const finalPoles = polesWithComponents.map((pole) => 
+              {
+              let overallCondition = getOverallCondition(pole.components)
+              let newPole : Pole = {
+                id: pole.id,
+                status: overallCondition,
+                date: pole.time_created,
+                components: pole.components
+              }
+              return newPole
+            } )
+            console.log("New Typed Poles")
+            
+            setPoles(finalPoles)
+          
+          } else {
+            setPoles([]);
+          }
+        } else {
+          setError('Error fetching image metadata');
+        }
+      } catch (error) {
+        setError(`Error: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImagesMetadata();
+  }, []);
+
+  
+
+  
+
+  if (loading) return (
+    <Card className="w-full">
+      <CardHeader className="text-center">
+        <CardTitle>Loading image metadata...</CardTitle>
+      </CardHeader>
+    </Card>
+  );
+  
+  if (error) return (
+    <Card className="w-full border-red-200">
+      <CardHeader className="bg-red-50 text-red-700">
+        <CardTitle>Error</CardTitle>
+        <CardDescription className="text-red-600">{error}</CardDescription>
+      </CardHeader>
+    </Card>
+  );
+
+  
   return (
-    <div className="min-h-screen bg-zinc-300 flex flex-col w-full">
+    <div className="min-h-screen b  g-zinc-300 flex flex-col w-full">
       <Navbar />
-      <div className="min-h-screen bg-zinc-300 flex flex-row items-center m-8 w-full">
+      <div className="min-h-screen flex flex-row items-center m-8 w-full">
         <div>
-          <Card className="w-75 mx-auto mt-10 m-10 p-6 shadow-lg bg-zinc-50 text-black border-t-10 border-rose-500">
-            <CardContent className="space-y-4 text-black">
-              <h2 className="text-xl font-semibold">Search Assets</h2>
 
-              {/* Asset Type Dropdown */}
-              <Select 
-                onValueChange={(value) =>
-                  handleSelectChange("assetType", value)
-                }
-                
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Asset Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {assetTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Condition Dropdown */}
-              <Select
-                onValueChange={(value) =>
-                  handleSelectChange("condition", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Condition" />
-                </SelectTrigger>
-                <SelectContent>
-                  {conditions.map((cond) => (
-                    <SelectItem key={cond} value={cond}>
-                      {cond} 
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Price Inputs */}
-              <div className="flex space-x-2">
-                <Input
-                  type="number"
-                  placeholder="Min Price"
-                  onChange={(e) =>
-                    handleInputChange("minPrice", e.target.value)
-                  }
-                />
-                <Input
-                  type="number"
-                  placeholder="Max Price"
-                  onChange={(e) =>
-                    handleInputChange("maxPrice", e.target.value)
-                  }
-                />
-              </div>
-
-              {/* Location Checkboxes */}
-              <div className="space-y-2">
-                <h3 className="text-md font-medium">Location</h3>
-                {locations.map((loc) => (
-                  <div key={loc.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={loc.value}
-                      onCheckedChange={() => handleCheckboxChange(loc.value)}
-                    />
-                    <label htmlFor={loc.value} className="text-sm">
-                      {loc.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-
-              {/* Search Button */}
-              <Button className="w-full" onClick={handleSearch}>
-                Search
-              </Button>
-            </CardContent>
-          </Card>
+      
         </div>
-        <div id = "results" className = "hidden">
-          <Card className="border-violet-700 border-l-5 w-230  bg-zinc-50 text-black font-semibold flex flex-row justify-around my-4">
-            <img src="./queryExample.jpg" className="h-17 l-0" />
-            <div>
-              <p>Pole_id : 2910384</p>
+        <div id = "results" >
+            
 
-              <p>Coordinates (34.439, 4324.756)</p>
+            {/*Data Table*/}
+          <DataTable columns = {columns} data = {poles}/>
 
-              <p>Asset Damage: Main Pole, Wiring</p>
-            </div>
-
-            <Button className="w-50 bg-violet-700 text-white">
-              Detailed Analysis
-            </Button>
-          </Card>
-          <Card className="border-violet-700 border-l-5 w-230  bg-zinc-50 text-black font-semibold flex flex-row justify-around my-4">
-            <img src="./queryExample.jpg" className="h-17 l-0" />
-            <div>
-              <p>Pole_id : 2910384</p>
-
-              <p>Coordinates (34.439, 4324.756)</p>
-
-              <p>Asset Damage: Main Pole, Wiring</p>
-            </div>
-
-            <Button className="w-50 bg-violet-700 text-white">
-              Detailed Analysis
-            </Button>
-          </Card>
-          <Card className="border-violet-700 border-l-5 w-230  bg-zinc-50 text-black font-semibold flex flex-row justify-around my-4">
-            <img src="./queryExample.jpg" className="h-17 l-0" />
-            <div>
-              <p>Pole_id : 2910384</p>
-
-              <p>Coordinates (34.439, 4324.756)</p>
-
-              <p>Asset Damage: Main Pole, Wiring</p>
-            </div>
-
-            <Button className="w-50 bg-violet-700 text-white">
-              Detailed Analysis
-            </Button>
-          </Card>
-          <Card className="border-violet-700 border-l-5 w-230  bg-zinc-50 text-black font-semibold flex flex-row justify-around my-4">
-            <img src="./queryExample.jpg" className="h-17 l-0" />
-            <div>
-              <p>Pole_id : 2910384</p>
-
-              <p>Coordinates (34.439, 4324.756)</p>
-
-              <p>Asset Damage: Main Pole, Wiring</p>
-            </div>
-
-            <Button className="w-50 bg-violet-700 text-white">
-              Detailed Analysis
-            </Button>
-          </Card>
         </div>
         
       </div>
     </div>
+
+
   );
-}
+  
+};
+
+export default QueryPage;
