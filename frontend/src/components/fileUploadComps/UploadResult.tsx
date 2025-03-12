@@ -14,7 +14,7 @@ export default function UploadResult ({ imageDetails, imageSrc}) {
         return 'bg-yellow-500';
       case 'poor':
         return 'bg-orange-500';
-      case 'critical':
+      case 'bad':
         return 'bg-red-500';
       default:
         return 'bg-gray-500';
@@ -26,18 +26,18 @@ export default function UploadResult ({ imageDetails, imageSrc}) {
      
       
       <div className="text-lg font-semibold">
-        <h2 className="text-2xl font-bold text-center mb-4">Image {imageDetails.id} Details</h2>
+        <h2 className="text-2xl font-bold text-center mb-4"> Inspection Report ID: #{imageDetails.id}</h2>
         <img 
           src={imageSrc} 
           alt={`Image ${imageDetails.id}`} 
           className="rounded-lg shadow-md mb-6 max-w-full h-auto"
           width="400" 
-        />
+          />
       </div>
       
       <Card className="w-full max-w-2xl shadow-lg">
-        <CardHeader className="bg-slate-50 border-b">
-          <CardTitle className="text-xl">Components</CardTitle>
+        <CardHeader className="bg-rose-500 border-b">
+          <CardTitle className="text-xl text-white font-bold">Components Status</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -54,19 +54,21 @@ export default function UploadResult ({ imageDetails, imageSrc}) {
                     <span className="text-sm text-gray-500">Quantity:</span>
                     <span className="font-semibold">{data.quantity}</span>
                   </div>
-                  <div>
+                  <div className = "flex items-center justify-between">
                     <span className="text-sm text-gray-500">Description:</span>
-                    <p className="text-sm mt-1">{data.description}</p>
+                    <span className="text-sm mt-1">{data.description}</span>
                   </div>
                 </div>
               </Card>
             ))}
           </div>
+
+    
         </CardContent>
       </Card>
       
       <p className="text-sm text-gray-500">
-        <strong>Created At:</strong> {new Date(imageDetails.time_created).toLocaleString()}
+        <strong>Logged into dataset at:</strong> {new Date(imageDetails.time_created).toLocaleString()}
         
       </p>
       

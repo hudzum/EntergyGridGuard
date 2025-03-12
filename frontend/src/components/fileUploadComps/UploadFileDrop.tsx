@@ -26,6 +26,7 @@ export default function UploadFileDrop({setImageId, setStatus}): JSX.Element {
     });
 
     try {
+      setStatus("processing")
       const response = await fetch("http://localhost:80/api/upload", {
         method: "POST",
         body: formData,
@@ -37,7 +38,7 @@ export default function UploadFileDrop({setImageId, setStatus}): JSX.Element {
         console.log(data);
         console.log("ImageID is this:", data.image_id);
         setImageId(data.image_id)
-        setStatus("processing")
+        
       } else {
         setMessage(`❌ Upload failed: ${data.error || "Unknown error"}`);
       }

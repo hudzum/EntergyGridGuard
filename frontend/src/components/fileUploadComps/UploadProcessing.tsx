@@ -47,7 +47,7 @@ export default function UploadProcessing ({imageId, setStatus, setImageDetails, 
         <div className="animate-spin">
                 <Loader className="h-12 w-12 text-violet-700" />
               </div>
-    <div className="text-lg font-semibold"> Analyzing your Pictures with our advanced, powerful Models. 💪</div>
+    <div className="text-lg font-semibold">Analyzing Pole Components for Damage with AI...</div>
           
     
     </div>
