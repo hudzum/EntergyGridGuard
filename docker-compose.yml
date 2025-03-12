@@ -26,6 +26,7 @@ services:
       - .env
     volumes:
       - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/app/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
+      - ~/.ssh/GIZMO_SSH_KEY_samuel_goodwin:/root/.ssh/GIZMO_SSH_KEY_samuel_goodwin:ro
     build: ./backend
     container_name: backend_service
     restart: always

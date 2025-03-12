@@ -2,6 +2,7 @@ import os
 import datetime
 from fastapi import UploadFile, File
 from .database import save_image_to_db
+from .api_control import start_api, stop_api
 import re
 from dotenv import load_dotenv, find_dotenv
 from sshtunnel import SSHTunnelForwarder
@@ -19,8 +20,10 @@ SSH_PORT = 34130
 SSH_USERNAME = os.getenv("SSH_USERNAME")
 SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
 
+SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
+
 REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
-LOCAL_BIND_ADDRESS = ("127.0.0.1", 0)
+LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -76,33 +79,36 @@ def send_image(image_path):
     Opens an SSH tunnel to the remote API, sends the image along with a question,
     and returns the parsed JSON response from the API.
     """
-    print("Attempting to SHH TUNNEL Local port is ")
-    print(f"SSH_USERNAME: {os.getenv('SSH_USERNAME')}")
-    print(f"SSH_KEY_PATH: {os.getenv('SSH_KEY_PATH')}")
-    
-    if not os.path.exists(SSH_KEY_PATH):
-        return {"error": f"SSH key file not found at: {SSH_KEY_PATH}"}
     try:
-        logging.basicConfig(level=logging.DEBUG)
+        print(f"[INFO] Attempting SSH tunnel to {SSH_HOST}:{SSH_PORT} with {SSH_USERNAME}...", flush=True)
+        print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
+
         with SSHTunnelForwarder(
             (SSH_HOST, SSH_PORT),
             ssh_username=SSH_USERNAME,
             ssh_pkey=SSH_KEY_PATH,
-            remote_bind_address=REMOTE_BIND_ADDRESS,
-            local_bind_address=LOCAL_BIND_ADDRESS
+            remote_bind_address=("127.0.0.1", 5353),  # **Use 127.0.0.1 instead of 0.0.0.0**
+            local_bind_address=("127.0.0.1", 9999)  # **Bind locally to 127.0.0.1**
         ) as tunnel:
             # SSH tunnel is now established.
             local_port = tunnel.local_bind_port
-            api_url = f"http://127.0.0.1:{local_port}{API_ENDPOINT}"
-            print(f"Tunnel established. Using API URL: {api_url}")
-        # Send the image to the API.
+            api_url = f"http://127.0.0.1:9999{API_ENDPOINT}"  # **Use 127.0.0.1**
+            print(f"[SUCCESS] Tunnel established. Using API URL: {api_url}", flush=True)
+
+            # Send the image to the API.
             with open(image_path, "rb") as img:
                 files = {"file": img}
-                response = requests.post(api_url, files=files)
-                return response.json()
-    except Exception as e:
-        return {"error": "Failed inside of Send_image:: "+str(e)}
+                response = requests.post(api_url, files=files, timeout=10)
 
+            print(f"[DEBUG] API Response Status Code: {response.status_code}", flush=True)
+            print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging
+
+            return response.json()
+
+    except Exception as e:
+        print("[ERROR] Failed to create SSH tunnel!", flush=True)
+        print(f"error SSH tunnel failure: {str(e)}")
+        return {"error": f"SSH tunnel failure: {str(e)}"}
 
 def parse_response(response):
     """
@@ -160,8 +166,10 @@ async def upload_image(file: UploadFile = File(...)):
         # Add this to components later
         gps_data = extract_lat_long(file_path)
         print("GPS:", gps_data)
-
+        
+        start_api()
         llm_response = send_image(file_path)  # Send the image to the LLM API via SSH tunnel
+        stop_api()
         components = parse_response(llm_response)  # Parse the response into valid JSON format
 
         # Convert the saved JPEG back to binary data for DB storage
