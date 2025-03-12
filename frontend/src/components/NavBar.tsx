@@ -29,25 +29,19 @@ export function Navbar() {
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavLink to="/map">
-                  <NavigationMenuLink >
-                    Map
-                  </NavigationMenuLink>
+                  Image Dets 
                 </NavLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
                 <NavLink to="/query">
-                  <NavigationMenuLink >
                     Query
-                  </NavigationMenuLink>
                 </NavLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
                 <NavLink to="/upload">
-                  <NavigationMenuLink>
                     Upload
-                  </NavigationMenuLink>
                 </NavLink>
               </NavigationMenuItem>
             </NavigationMenuList>

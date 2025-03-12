@@ -10,7 +10,7 @@ import json
 from PIL import Image
 import piexif
 import io
-
+import logging
 load_dotenv(find_dotenv())
 
 SSH_HOST = "45.21.85.155"
@@ -20,7 +20,7 @@ SSH_USERNAME = os.getenv("SSH_USERNAME")
 SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
 
 REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
-LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
+LOCAL_BIND_ADDRESS = ("127.0.0.1", 0)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -76,22 +76,32 @@ def send_image(image_path):
     Opens an SSH tunnel to the remote API, sends the image along with a question,
     and returns the parsed JSON response from the API.
     """
-    with SSHTunnelForwarder(
-        (SSH_HOST, SSH_PORT),
-        ssh_username=SSH_USERNAME,
-        ssh_pkey=SSH_KEY_PATH,
-        remote_bind_address=REMOTE_BIND_ADDRESS,
-        local_bind_address=LOCAL_BIND_ADDRESS
-    ) as tunnel:
-        # SSH tunnel is now established.
-        local_port = tunnel.local_bind_port
-        api_url = f"http://0.0.0.0:{local_port}{API_ENDPOINT}"
-        print(f"Tunnel established. Using API URL: {api_url}")
-    # Send the image to the API.
-        with open(image_path, "rb") as img:
-            files = {"file": img}
-            response = requests.post(api_url, files=files)
-            return response.json()
+    print("Attempting to SHH TUNNEL Local port is ")
+    print(f"SSH_USERNAME: {os.getenv('SSH_USERNAME')}")
+    print(f"SSH_KEY_PATH: {os.getenv('SSH_KEY_PATH')}")
+    
+    if not os.path.exists(SSH_KEY_PATH):
+        return {"error": f"SSH key file not found at: {SSH_KEY_PATH}"}
+    try:
+        logging.basicConfig(level=logging.DEBUG)
+        with SSHTunnelForwarder(
+            (SSH_HOST, SSH_PORT),
+            ssh_username=SSH_USERNAME,
+            ssh_pkey=SSH_KEY_PATH,
+            remote_bind_address=REMOTE_BIND_ADDRESS,
+            local_bind_address=LOCAL_BIND_ADDRESS
+        ) as tunnel:
+            # SSH tunnel is now established.
+            local_port = tunnel.local_bind_port
+            api_url = f"http://127.0.0.1:{local_port}{API_ENDPOINT}"
+            print(f"Tunnel established. Using API URL: {api_url}")
+        # Send the image to the API.
+            with open(image_path, "rb") as img:
+                files = {"file": img}
+                response = requests.post(api_url, files=files)
+                return response.json()
+    except Exception as e:
+        return {"error": "Failed inside of Send_image:: "+str(e)}
 
 
 def parse_response(response):
@@ -166,4 +176,4 @@ async def upload_image(file: UploadFile = File(...)):
             return {"error": "Failed to save image to database"}
 
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": "Failed at Upload_image"+ str(e)}

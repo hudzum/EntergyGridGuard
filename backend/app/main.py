@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.orm import Session
 from .imaging import upload_image
-from .database import get_image_details, get_image_by_id, get_images, get_db
+from .database import get_image_details, get_image_by_id, get_images, get_db, get_image_metadata
 from io import BytesIO
 
 app = FastAPI()
@@ -58,6 +58,14 @@ def get_image_binary(image_id: int, db: Session = Depends(get_db)):
     # Use StreamingResponse to send the image in binary format to the client
     return StreamingResponse(BytesIO(image_data), media_type="image/png")
 
+@app.get("/api/images-meta")
+async def fetech_images_meta(db: Session = Depends(get_db)):
+    "Fetch All images with Component Data and No Encoded Images"
+    try:
+        images = get_image_metadata(db)
+        return JSONResponse(content={"images": images})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
 #if __name__ == "__main__":
     #import uvicorn
     #uvicorn.run(app, host="0.0.0.0", port=8000)

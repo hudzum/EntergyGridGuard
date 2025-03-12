@@ -61,11 +61,32 @@ def save_image_to_db(image_data: bytes, components: dict = None):
         print("Database Error:", e)
         return None
 
-# Does not have a use yet
+# Used for Query Page
 def get_image_metadata(db: Session):
-    """Fetch only ID and time_created for all images."""
-    images = db.query(Picture.id, Picture.time_created).all()
-    return [{"id": pic.id, "time_created": pic.time_created.isoformat()} for pic in images]
+    """Fetch all images with just their metadata, excluding the binary data."""
+    print("Starting metadata-only database query")
+    
+    # Query only the fields you need, excluding the picture binary data
+    pictures = db.query(
+        Picture.id, 
+        Picture.time_created, 
+        Picture.components
+    ).all()
+    
+    print(f"Query Completed, found {len(pictures)} pictures")
+    
+    if not pictures:
+        print("No pictures found in database")
+        return []
+        
+    images = []
+    for picture in pictures:
+        images.append({
+            "id": picture.id,
+            "time_created": picture.time_created.isoformat(),
+            "components": picture.components
+        })
+    return images
 
 def get_image_details(db: Session, image_id: int):
     """Fetch all details of a single image except binary data."""
@@ -87,10 +108,17 @@ def get_image_by_id(db: Session, image_id: int):
 
 def get_images(db: Session):
     """Fetch all images along with their metadata and encode binary data to Base64."""
+    print("Starting database query")
     pictures = db.query(Picture).all()
-
+    print(f"Query Completed, found {len(pictures)} pictures")
+    
+    if not pictures:
+        print("No pictures found in database")
+        return []
+        
     images = []
     for picture in pictures:
+        print(f"Processing picture ID: {picture.id}")
         # Base64 encode the binary image data
         encoded_image = base64.b64encode(picture.picture).decode("utf-8")
         images.append({
