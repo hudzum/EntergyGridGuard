@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.orm import Session
 from .imaging import upload_image
-from .database import get_image_details, get_image_by_id, get_images, get_db, get_image_metadata
+from .database import get_image_details, get_image_by_id, get_images, get_db, get_image_metadata, get_thumbnail_by_id
 from io import BytesIO
 
 app = FastAPI()
@@ -66,6 +66,16 @@ async def fetech_images_meta(db: Session = Depends(get_db)):
         return JSONResponse(content={"images": images})
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
+
+@app.get("/api/images/{image_id}/thumbnail")
+def get_thumbnail(image_id: int, db: Session = Depends(get_db)):
+    """Returns the thumbnail of the image as binary data."""
+    thumbnail_data = get_thumbnail_by_id(db, image_id)
+    if thumbnail_data is None:
+        raise HTTPException(status_code=404, detail="Thumbnail not found")
+
+    return StreamingResponse(BytesIO(thumbnail_data), media_type="image/jpeg")
+
 #if __name__ == "__main__":
     #import uvicorn
     #uvicorn.run(app, host="0.0.0.0", port=8000)
