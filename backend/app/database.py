@@ -21,6 +21,7 @@ class Picture(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     picture = Column(LargeBinary)
+    thumbnail = Column(LargeBinary)
     components = Column(JSON, default={})
     time_created = Column(DateTime, default=datetime.now(timezone.utc))
 
@@ -34,7 +35,7 @@ def get_db():
         db.close()
 
 
-def save_image_to_db(image_data: bytes, components: dict = None):
+def save_image_to_db(image_data: bytes, thumbnail_data:bytes, components: dict = None):
     """Saves image binary data to the database with empty 'components' and current timestamp."""
     db = next(get_db())  # Get the database session
     if components is None:
@@ -43,6 +44,7 @@ def save_image_to_db(image_data: bytes, components: dict = None):
         # Create a new Picture object (Leave components as empty for initial testing)
         picture = Picture(
             picture=image_data,
+            # thumbnail=thumbnail_data, # Some issues here when trying to call image metadata
             components=components,
             time_created=datetime.now(timezone.utc)
         )
@@ -88,16 +90,16 @@ def get_image_metadata(db: Session):
         })
     return images
 
-def get_image_details(db: Session, image_id: int):
-    """Fetch all details of a single image except binary data."""
-    image = db.query(Picture).filter(Picture.id == image_id).first()
-    if image:
-        return {
-            "id": image.id,
-            "components": image.components,
-            "time_created": image.time_created.isoformat()
-        }
-    return None
+# def get_image_details(db: Session, image_id: int):
+#     """Fetch all details of a single image except binary data."""
+#     image = db.query(Picture).filter(Picture.id == image_id).first()
+#     if image:
+#         return {
+#             "id": image.id,
+#             "components": image.components,
+#             "time_created": image.time_created.isoformat()
+#         }
+#     return None
 
 def get_image_by_id(db: Session, image_id: int):
     """Fetch the image binary data by its ID."""
@@ -128,3 +130,16 @@ def get_images(db: Session):
         })
 
     return images
+
+# Temporary for testing, eventually can just move it into metadata retrieval and parse on frontend
+def get_thumbnail_by_id(db: Session, image_id: int):
+     """Fetch the thumbnail binary data by its ID and return it as Base64 encoded."""
+     image = db.query(Picture).filter(Picture.id == image_id).first()
+     if image and image.thumbnail:
+         # Base64 encode the thumbnail binary data
+         encoded_thumbnail = base64.b64encode(image.thumbnail.tobytes()).decode("utf-8")
+         return {
+             "id": image.id,
+             "thumbnail": encoded_thumbnail  # Base64 encoded thumbnail
+         }
+     return None

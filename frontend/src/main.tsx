@@ -5,6 +5,7 @@ import App from './App.tsx'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import UploadPage from './pages/Uploadpage.tsx'
 import QueryPage from './pages/QueryPage.tsx'
+import ThumbnailPage from './pages/ThumbnailPage.tsx'
 import {MapPage} from "@/map/MapPage.tsx";
 
 createRoot(document.getElementById('root')!).render(
@@ -18,6 +19,10 @@ createRoot(document.getElementById('root')!).render(
         <Route path = "query" element = {<QueryPage/>}/>
 
         <Route path = "upload" element = {<UploadPage/>}/>
+
+        <Route path = "thumbnail" element = {<ThumbnailPage/>}/>
+
+
       </Routes>
    
     </BrowserRouter>
