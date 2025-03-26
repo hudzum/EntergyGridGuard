@@ -20,6 +20,12 @@ SSH_PORT = 34130
 SSH_USERNAME = os.getenv("SSH_USERNAME")
 SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
 
+file_path = r"C:\Users\Elswo\.ssh\GIZMO_SSH_KEY_zachary_pham"
+if os.path.exists(file_path):
+    print(f"File exists at {file_path}")
+else:
+    print(f"File does not exist at {file_path}")
+
 SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
 
 REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
@@ -29,6 +35,21 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 API_ENDPOINT = "/analyze-image/"
+
+def create_thumbnail(image_data: bytes, max_size=(300,300)) -> bytes:
+    """Generate a downscaled version of the image."""
+    try:
+        image = Image.open(io.BytesIO(image_data))
+        image.thumbnail(max_size)
+
+        with io.BytesIO() as output:
+            image.save(output, format="JPEG", quality=85)
+            thumbnail_data = output.getvalue()
+
+        return thumbnail_data
+    except Exception as e:
+        print("Error creating thumbnail:", e)
+        return None
 
 def extract_lat_long(image_path):
     """
@@ -158,15 +179,14 @@ async def upload_image(file: UploadFile = File(...)):
         else:
             image.save(file_path, "JPEG", quality=95)  # No metadata if none exists
 
-        #with open(file_path, "wb") as f:
-             #f.write(image_data)
-
         print(f"Image saved to: {os.path.abspath(file_path)}")
+
+        thumbnail_data = create_thumbnail(image_data)
 
         # Add this to components later
         gps_data = extract_lat_long(file_path)
         print("GPS:", gps_data)
-        
+
         start_api()
         llm_response = send_image(file_path)  # Send the image to the LLM API via SSH tunnel
         stop_api()
@@ -176,7 +196,7 @@ async def upload_image(file: UploadFile = File(...)):
         with open(file_path, "rb") as f:
             jpeg_data = f.read()
 
-        image_id = save_image_to_db(jpeg_data, components)
+        image_id = save_image_to_db(jpeg_data, thumbnail_data, components)
 
         if image_id:
             return {"message": "Image uploaded successfully", "image_id": image_id}
