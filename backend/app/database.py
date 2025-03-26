@@ -71,7 +71,8 @@ def get_image_metadata(db: Session):
     # Query only the fields you need, excluding the picture binary data
     pictures = db.query(
         Picture.id, 
-        Picture.time_created, 
+        Picture.time_created,
+        # Picture.thumbnail,
         Picture.components
     ).all()
     
@@ -137,7 +138,7 @@ def get_thumbnail_by_id(db: Session, image_id: int):
      image = db.query(Picture).filter(Picture.id == image_id).first()
      if image and image.thumbnail:
          # Base64 encode the thumbnail binary data
-         encoded_thumbnail = base64.b64encode(image.thumbnail.tobytes()).decode("utf-8")
+         encoded_thumbnail = base64.b64encode(image.thumbnail).decode("utf-8")
          return {
              "id": image.id,
              "thumbnail": encoded_thumbnail  # Base64 encoded thumbnail
