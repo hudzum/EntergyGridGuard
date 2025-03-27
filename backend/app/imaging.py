@@ -22,7 +22,7 @@ SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
 
 SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
 
-REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
+REMOTE_BIND_ADDRESS = ("0.0.0.0", 5354)
 LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
 
 UPLOAD_DIR = "uploads"
@@ -87,7 +87,7 @@ def send_image(image_path):
             (SSH_HOST, SSH_PORT),
             ssh_username=SSH_USERNAME,
             ssh_pkey=SSH_KEY_PATH,
-            remote_bind_address=("127.0.0.1", 5353),  # **Use 127.0.0.1 instead of 0.0.0.0**
+            remote_bind_address=("127.0.0.1", 5354),  # **Use 127.0.0.1 instead of 0.0.0.0**
             local_bind_address=("127.0.0.1", 9999)  # **Bind locally to 127.0.0.1**
         ) as tunnel:
             # SSH tunnel is now established.
@@ -98,7 +98,7 @@ def send_image(image_path):
             # Send the image to the API.
             with open(image_path, "rb") as img:
                 files = {"file": img}
-                response = requests.post(api_url, files=files, timeout=10)
+                response = requests.post(api_url, files=files, timeout=30)
 
             print(f"[DEBUG] API Response Status Code: {response.status_code}", flush=True)
             print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging

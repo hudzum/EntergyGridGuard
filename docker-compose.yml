@@ -30,8 +30,6 @@ services:
     build: ./backend
     container_name: backend_service
     restart: always
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
     ports:
       - "80:80"
 

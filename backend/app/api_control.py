@@ -17,7 +17,7 @@ SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
 API_DIRECTORY = os.getenv("API_DIRECTORY")
 API_SCRIPT = "run_qwen.py"
 
-REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
+REMOTE_BIND_ADDRESS = ("0.0.0.0", 5354)
 LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
 
 def start_api():
@@ -63,7 +63,7 @@ def start_api():
         for attempt in range(max_retries):
             try:
                 # Run curl inside the SSH connection to check the API
-                check_command = f"curl -s -o /dev/null -w '%{{http_code}}' http://127.0.0.1:5353/"
+                check_command = f"curl -s -o /dev/null -w '%{{http_code}}' http://127.0.0.1:5354/"
                 stdin, stdout, stderr = ssh.exec_command(check_command)
                 response_code = stdout.read().decode().strip()
 
