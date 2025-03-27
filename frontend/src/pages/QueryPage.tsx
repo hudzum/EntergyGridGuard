@@ -149,12 +149,6 @@ const QueryPage = () => {
   // Conditions
   const conditions = ["Good", "Bad", "Unknown", "Any"];
 
-  // Location Options
-  const locations = [
-    { label: "Within 15 miles", value: "15" },
-    { label: "Within 30 miles", value: "30" },
-    { label: "Within 60 miles", value: "60" },
-  ];
 
   // Handle Select Change
   const handleSelectChange = (key, value) => {
@@ -212,11 +206,10 @@ const QueryPage = () => {
     <div className="min-h-screen bg-zinc-300 flex flex-col w-full">
       <Navbar />
       <div className="flex justify-between m-2 align-center ">
-        <Card className="shadow-lg bg-zinc-50 text-black border-1 border-rose-500 w-75 h-110 flex-none p-2">
+        <Card className="shadow-lg bg-zinc-50 text-black border-1 border-rose-500 w-75 h-75 flex-none p-2">
           <CardContent className="p-4 space-y-4 text-black">
             <h2 className="text-xl font-semibold">Search Assets</h2>
 
-            {/* Asset Type Dropdown */}
             <Select
               onValueChange={(value) => handleSelectChange("assetType", value)}
             >
@@ -232,7 +225,6 @@ const QueryPage = () => {
               </SelectContent>
             </Select>
 
-            {/* Condition Dropdown */}
             <Select
               onValueChange={(value) => handleSelectChange("condition", value)}
             >
@@ -248,37 +240,9 @@ const QueryPage = () => {
               </SelectContent>
             </Select>
 
-            {/* Price Inputs */}
-            <div className="flex space-x-2">
-              <Input
-                type="number"
-                placeholder="Min Price"
-                onChange={(e) => handleInputChange("minPrice", e.target.value)}
-              />
-              <Input
-                type="number"
-                placeholder="Max Price"
-                onChange={(e) => handleInputChange("maxPrice", e.target.value)}
-              />
-            </div>
+          
 
-            {/* Location Checkboxes */}
-            <div className="space-y-2">
-              <h3 className="text-md font-medium">Location</h3>
-              {locations.map((loc) => (
-                <div key={loc.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={loc.value}
-                    onCheckedChange={() => handleCheckboxChange(loc.value)}
-                  />
-                  <label htmlFor={loc.value} className="text-sm">
-                    {loc.label}
-                  </label>
-                </div>
-              ))}
-            </div>
-
-            {/* Search Button */}
+          
             <Button
               className="w-full bg-rose-500 text-white"
               onClick={handleSearch}

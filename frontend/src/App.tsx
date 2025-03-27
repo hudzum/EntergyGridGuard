@@ -1,13 +1,22 @@
 import React from "react";
 import { Navbar } from "./components/NavBar";
 import { Button } from "./components/ui/button";
-
+import {
+  Carousel,
+  CarouselContent,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselItem,
+} from "./components/ui/carousel";
+import CarChild from "./components/CarouselItem";
+import Autoplay from "embla-carousel-autoplay";
+import { Card } from "./components/ui/card";
 function App() {
   return (
     <div className="min-h-screen bg-zinc-300 flex flex-col w-full">
       {/* Navbar should be outside the main content container */}
       <Navbar />
-      
+
       {/* Main content section */}
       <main className="flex-grow flex items-center justify-center w-full px-4 py-8">
         <div className="bg-zinc-50  rounded-lg shadow-lg overflow-hidden">
@@ -18,25 +27,93 @@ function App() {
                 <span className="text-transparent bg-gradient-to-r from-purple-600 to-rose-500 bg-clip-text">
                   ERIC
                 </span>{" "}
-              powered by Entergy 
+                powered by Entergy
               </h1>
               <p className="text-zinc-600 text-lg mb-8 max-w-2xl mx-auto">
-              Harnessing AI to Help Entergy Technicians Quickly Locate and Repair Damaged Power Poles with Precision and Efficiency.
+                Harnessing AI to Help Entergy Technicians Quickly Locate and
+                Repair Damaged Power Poles with Precision and Efficiency.
               </p>
-              <Button className="bg-rose-500">
-                Learn More
-              </Button>
+              <Button className="bg-rose-500">Learn More</Button>
             </div>
+
+            <div className=" relative w-full flex flex-col items-center justify-center m-4">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-[90%] h-40 bg-rose-500/30 rounded-full blur-3xl"></div>
+
+              <Carousel
+                className="max-w-4xl w-full"
+                plugins={[
+                  Autoplay({
+                    delay: 2000,
+                  }),
+                ]}
+              >
+                <CarouselContent>
+                  <CarouselItem>
+                    <div className="flex justify-center p-4">
+                      <CarChild
+                        imagePath="./carousel/carousel1.png"
+                        initialTitle="LLM-Powered Damage Analytics"
+                        initialDescription="Get in-depth breakdowns of pole components and damage severity with our AI-driven analytics. Our system provides clear, concise descriptions, ensuring you understand the condition of each structure at a glance."
+                        onTitleChange={(title) => console.log(title)}
+                        onDescriptionChange={(desc) => console.log(desc)}
+                      />
+                    </div>
+                  </CarouselItem>
+
+                  <CarouselItem>
+                    <div className="flex justify-center p-4">
+                      <CarChild
+                        imagePath="./carousel/carousel2.png"
+                        initialTitle="Intelligent Pole Database"
+                        initialDescription="Effortlessly store and retrieve utility pole data with our intuitive database system. Navigate through records seamlessly, query specific poles with ease, and access structured insights—all in one streamlined interface."
+                        onTitleChange={(title) => console.log(title)}
+                        onDescriptionChange={(desc) => console.log(desc)}
+                      />
+                    </div>
+                  </CarouselItem>
+
+                  <CarouselItem>
+                    <div className="flex justify-center p-4">
+                      <CarChild
+                        imagePath="./carousel/carousel3.png"
+                        initialTitle="AI Generated Damage Reports"
+                        initialDescription="Transform raw data into comprehensive reports with a single click. Our AI compiles detailed component analyses, damage assessments, and key takeaways, giving you professional-grade insights instantly."
+                        onTitleChange={(title) => console.log(title)}
+                        onDescriptionChange={(desc) => console.log(desc)}
+                      />
+                    </div>
+                  </CarouselItem>
+                </CarouselContent>
+                <div className="flex justify-center items-center space-x-4 mt-4">
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </div>
+              </Carousel>
+            </div>
+          </div>
+
+          {/*About Us*/}
+          <div className=" flex flex-col w-full max-w-4xl items-center justify-center text-center">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6 text-black">
+              About Us
+            </h1>
             
-            {/* Hero image */}
-            <div className="relative w-full max-w-4xl">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-[90%] h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
-              <img
-                src="./Hero.png"
-                alt="dashboard"
-                className="relative w-full rounded-lg border border-gray-200 shadow-lg"
-              />
-            </div>
+            <img
+              src="./team.jpeg"
+              alt="dashboard"
+              className=" w-2/3 rounded-lg border border-gray-200 shadow-lg"
+            />
+
+            <Card>
+              <p className="text-zinc-600 text-sm mb-8 max-w-2xl mx-auto">
+                We are a team of LSU students passionate about leveraging AI to
+                solve real-world challenges. Collaborating with experienced
+                mentors from Entergy, Our goal is to streamline damage
+                assessment with intelligent databases, AI-powered analytics, and
+                automated reporting—helping industries make faster, data-driven
+                decisions.
+              </p>
+            </Card>
           </div>
         </div>
       </main>
