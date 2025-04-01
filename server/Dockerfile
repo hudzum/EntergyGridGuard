@@ -12,6 +12,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 RUN apk add apache2-utils
 
 COPY ./server/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./server/ssl-dhparams.pem /etc/nginx/ssl/ssl-dhparams.pem
 
 COPY ./server/setup.sh .
 RUN chmod +x setup.sh

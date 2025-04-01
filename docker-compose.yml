@@ -36,6 +36,7 @@ services:
       - SSH_KEY
     ports:
       - "8080:80"
+    image: muhammedhab/backend_service:latest
 
   frontend:
     build: ./frontend
@@ -61,3 +62,4 @@ services:
       - SSL_CRT
       - DEFAULT_USER
       - DEFAULT_PASS
+    image: muhammedhab/server:latest

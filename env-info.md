@@ -23,10 +23,10 @@ The base-64 encoded ssh private key. must be a valid ecdsa key readable by param
 ## Frontend Server (container name server)
 
 ### SSL_KEY
-The base-64 encoded ssl key. Must be a valid KEY file readable by nginx.
+The base-64 encoded ssl key. Must be a valid PEM private key file readable by nginx.
 
 ### SSL_CRT
-The base-64 encoded ssl certificate. Must be a valid CRT file readable by nginx.
+The base-64 encoded ssl certificate. Must be a valid PEM certificate file readable by nginx.
 
 ### DEFAULT_USER, DEFAULT_PASS
 The credentials which nginx will use to verify connections to the server.
