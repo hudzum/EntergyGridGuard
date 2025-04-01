@@ -2,6 +2,7 @@ import paramiko
 import time
 import os
 import sys
+import base64
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -10,9 +11,11 @@ SSH_HOST = "45.21.85.155"
 SSH_PORT = 34130
 # Define environmental variables for your own GIZMO username and ssh key path.
 SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
+SSH_KEY = os.getenv("SSH_KEY")
 
-SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
+import io
+
+ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
 
 API_DIRECTORY = os.getenv("API_DIRECTORY")
 API_SCRIPT = "run_qwen.py"
@@ -34,7 +37,7 @@ def start_api():
 
     try:
         print("[INFO] Connecting to SSH...", flush=True)
-        ssh.connect(SSH_HOST, username=SSH_USERNAME, key_filename=SSH_KEY_PATH, port=SSH_PORT)
+        ssh.connect(SSH_HOST, username=SSH_USERNAME, pkey=ssh_pkey, port=SSH_PORT)
         print("before command", flush=True)
 
         stdin, stdout, stderr = ssh.exec_command(command)
@@ -93,7 +96,7 @@ def stop_api():
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     
     try:
-        ssh.connect(SSH_HOST, username=SSH_USERNAME, key_filename=SSH_KEY_PATH, port=34130)
+        ssh.connect(SSH_HOST, username=SSH_USERNAME, pkey=ssh_pkey, port=34130)
         stdin, stdout, stderr = ssh.exec_command(command)
         time.sleep(2)  # Give time for the process to terminate
         print("API stopped")

@@ -11,6 +11,8 @@ import json
 from PIL import Image
 import piexif
 import io
+import paramiko
+import base64
 import logging
 load_dotenv(find_dotenv())
 
@@ -18,9 +20,10 @@ SSH_HOST = "45.21.85.155"
 SSH_PORT = 34130
 # Define environmental variables for your own GIZMO username and ssh key path.
 SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
+SSH_KEY = os.getenv("SSH_KEY")
+import io
 
-SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
+ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
 
 REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
 LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
@@ -81,12 +84,12 @@ def send_image(image_path):
     """
     try:
         print(f"[INFO] Attempting SSH tunnel to {SSH_HOST}:{SSH_PORT} with {SSH_USERNAME}...", flush=True)
-        print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
+#         print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
 
         with SSHTunnelForwarder(
             (SSH_HOST, SSH_PORT),
             ssh_username=SSH_USERNAME,
-            ssh_pkey=SSH_KEY_PATH,
+            ssh_pkey=ssh_pkey,
             remote_bind_address=("127.0.0.1", 5353),  # **Use 127.0.0.1 instead of 0.0.0.0**
             local_bind_address=("127.0.0.1", 9999)  # **Bind locally to 127.0.0.1**
         ) as tunnel:

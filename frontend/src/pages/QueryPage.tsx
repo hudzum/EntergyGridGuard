@@ -67,7 +67,7 @@ const QueryPage = () => {
       console.log("Attempting to fetch Pole Data ");
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:80/api/images-meta`);
+        const response = await fetch(`/api/images-meta`);
         if (response.ok) {
           const data = await response.json();
 

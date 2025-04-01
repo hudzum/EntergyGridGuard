@@ -16,7 +16,7 @@ const ImageDetails: React.FC<ImageDetailsProps> = ({ imageId, imageData, onClose
   useEffect(() => {
     async function fetchImage() {
       try {
-        const response = await fetch(`http://localhost:80/api/images/${imageId}/data`);
+        const response = await fetch(`/api/images/${imageId}/data`);
         if (response.ok) {
           // Get the binary response as a Blob
           const blob = await response.blob();
