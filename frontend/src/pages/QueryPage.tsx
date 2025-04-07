@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/NavBar";
-
 import {
   Card,
   CardContent,
@@ -10,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { DataTable } from "@/components/tableFilterComps/data-table";
 import { columns } from "@/components/tableFilterComps/columns";
-
 import {
   Select,
   SelectTrigger,
@@ -28,13 +26,14 @@ const QueryPage = () => {
     id: number;
     status: string;
     date: string;
-    components: {};
+    components: {}; // This can be an empty object if no components are provided
+    thumbnail?: string; // Optional thumbnail for hover
   };
-  const [allPoles, setAllPoles] = useState<Pole[]>([]); //Every Pole
-  const [poles, setPoles] = useState<Pole[]>([]); //Poles Displayed based on filters
-  //const [poles, setPoles] = useState([]);
+
+  const [allPoles, setAllPoles] = useState<Pole[]>([]); // All poles
+  const [poles, setPoles] = useState<Pole[]>([]); // Poles to display based on filters
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [filters, setFilters] = useState({
     assetType: "",
@@ -44,8 +43,14 @@ const QueryPage = () => {
     location: [],
   });
 
-  //Determines an overall condition of the pole
-  function getOverallCondition(components) {
+  const [hoveredPoleId, setHoveredPoleId] = useState<number | null>(null);
+
+  // Determines the overall condition of the pole
+  function getOverallCondition(components: {}) {
+    if (Object.keys(components).length === 0) {
+      return "Unknown"; // If no components, default to 'Unknown' status
+    }
+
     const conditionCounts = { bad: 0, good: 0, unknown: 0 };
 
     for (const key in components) {
@@ -54,13 +59,13 @@ const QueryPage = () => {
       }
     }
 
-    // Determine the condition with the highest count
     let overallCondition = Object.keys(conditionCounts).reduce((a, b) =>
       conditionCounts[a] > conditionCounts[b] ? a : b
     );
 
     return overallCondition;
   }
+
   // Fetching Data
   useEffect(() => {
     const fetchImagesMetadata = async () => {
@@ -75,21 +80,14 @@ const QueryPage = () => {
             console.log("Original Array");
             console.log(data.images);
 
-            const polesWithComponents = data.images.filter(
-              (pole) =>
-                Object.keys(pole.components).length > 0 &&
-                pole.components != "{}"
-            );
-            console.log("No Blank Components");
-            console.log(polesWithComponents);
-
-            const finalPoles = polesWithComponents.map((pole) => {
+            const finalPoles = data.images.map((pole) => {
               let overallCondition = getOverallCondition(pole.components);
               let newPole: Pole = {
                 id: pole.id,
                 status: overallCondition,
                 date: pole.time_created,
-                components: pole.components,
+                components: pole.components || {}, // Ensure components is always an object
+                thumbnail: pole.thumbnail || undefined, // Placeholder
               };
               return newPole;
             });
@@ -98,7 +96,7 @@ const QueryPage = () => {
             setPoles(finalPoles);
             setAllPoles(finalPoles);
           } else {
-            setPoles([]);
+            setPoles([]); // Set to empty if no poles are available
           }
         } else {
           setError("Error fetching image metadata");
@@ -132,9 +130,7 @@ const QueryPage = () => {
       </Card>
     );
 
-  //Filter
-
-  // Asset Types
+  // Filter logic...
   const assetTypes = [
     "Overall",
     "Pole",
@@ -146,27 +142,22 @@ const QueryPage = () => {
     "Transformers",
   ];
 
-  // Conditions
   const conditions = ["Good", "Bad", "Unknown", "Any"];
 
-  // Location Options
   const locations = [
     { label: "Within 15 miles", value: "15" },
     { label: "Within 30 miles", value: "30" },
     { label: "Within 60 miles", value: "60" },
   ];
 
-  // Handle Select Change
   const handleSelectChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Handle Input Change
   const handleInputChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Handle Checkbox Change
   const handleCheckboxChange = (value) => {
     setFilters((prev) => {
       const updatedLocations = prev.location.includes(value)
@@ -177,26 +168,22 @@ const QueryPage = () => {
     });
   };
 
-  // Handle Search
   const handleSearch = () => {
     console.log("Filters Applied:", filters);
     let assetType = filters.assetType.toLowerCase();
     let condition = filters.condition.toLowerCase();
-    if (assetType == "overall" && condition == "any") {
+    if (assetType === "overall" && condition === "any") {
       setPoles(allPoles);
-    } else if (assetType == "overall") {
-      console.log("overall with filter", condition);
-      const newPoles = allPoles.filter((pole) => pole.status == condition);
+    } else if (assetType === "overall") {
+      const newPoles = allPoles.filter((pole) => pole.status === condition);
       setPoles(newPoles);
-    } else if (condition == "any") {
+    } else if (condition === "any") {
       setPoles(allPoles);
     } else {
-      console.log("Filtering this ", assetType, " ", condition);
-
       const newPoles = allPoles.filter(
         (pole) =>
           pole.components[assetType] &&
-          pole.components[assetType].condition == condition
+          pole.components[assetType].condition === condition
       );
       setPoles(newPoles);
     }
@@ -290,7 +277,34 @@ const QueryPage = () => {
 
         <Card className="border-violet-700 border-t-4 w-250 flex-1">
           <h2 className="text-2xl font-semibold">Utility Pole Inventory</h2>
-          <DataTable columns={columns} data={poles} />
+          <div className="relative">
+            {/* Displaying Thumbnail on Hover */}
+            {hoveredPoleId && (
+              <div
+                className="absolute bg-white p-2 shadow-md rounded"
+                style={{
+                  top: "10px",
+                  left: "10px",
+                  zIndex: 10,
+                }}
+              >
+                <img
+                  src={
+                    poles.find((pole) => pole.id === hoveredPoleId)?.thumbnail ||
+                    ""
+                  }
+                  alt="Thumbnail"
+                  className="h-24 w-24 object-cover"
+                />
+              </div>
+            )}
+            <DataTable
+              columns={columns}
+              data={poles}
+              onRowHover={(id) => setHoveredPoleId(id)}
+              onRowLeave={() => setHoveredPoleId(null)}
+            />
+          </div>
         </Card>
       </div>
     </div>
