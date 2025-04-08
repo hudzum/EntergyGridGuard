@@ -22,9 +22,6 @@ SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
 
 SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
 
-REMOTE_BIND_ADDRESS = ("0.0.0.0", 5354)
-LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
-
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 

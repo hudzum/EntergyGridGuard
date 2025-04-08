@@ -22,12 +22,20 @@ LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
 
 def start_api():
     """Starts the FastAPI application on the remote server and waits until it is fully ready."""
-    command = (
-        f"source /home/samuel_goodwin/miniconda3/etc/profile.d/conda.sh && "
-        f"conda activate llm_production && "
-        f"cd {API_DIRECTORY} && "
-        f"(nohup python3 {API_SCRIPT} > api.log 2>&1 & echo $!)"
-    )
+    command = f'''
+    bash -c '
+    source /home/{SSH_USERNAME}/miniconda3/etc/profile.d/conda.sh
+    if ! conda info --envs | grep -q "^llm_production"; then
+        conda create -y --name llm_production
+    fi
+    conda activate llm_production
+    pip install fastapi uvicorn transformers torch pillow
+    cd {API_DIRECTORY}
+    nohup python3 {API_SCRIPT} > api.log 2>&1 &
+    echo $!
+    '
+    '''
+
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
