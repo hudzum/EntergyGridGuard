@@ -31,6 +31,8 @@ LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+API_URL = os.getenv("AI_API_URL")
+
 API_ENDPOINT = "/analyze-image/"
 
 def extract_lat_long(image_path):
@@ -86,27 +88,18 @@ def send_image(image_path):
         print(f"[INFO] Attempting SSH tunnel to {SSH_HOST}:{SSH_PORT} with {SSH_USERNAME}...", flush=True)
 #         print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
 
-        with SSHTunnelForwarder(
-            (SSH_HOST, SSH_PORT),
-            ssh_username=SSH_USERNAME,
-            ssh_pkey=ssh_pkey,
-            remote_bind_address=("127.0.0.1", 5353),  # **Use 127.0.0.1 instead of 0.0.0.0**
-            local_bind_address=("127.0.0.1", 9999)  # **Bind locally to 127.0.0.1**
-        ) as tunnel:
-            # SSH tunnel is now established.
-            local_port = tunnel.local_bind_port
-            api_url = f"http://127.0.0.1:9999{API_ENDPOINT}"  # **Use 127.0.0.1**
-            print(f"[SUCCESS] Tunnel established. Using API URL: {api_url}", flush=True)
+        api_url = f"{API_URL}{API_ENDPOINT}"  # **Use 127.0.0.1**
+        print(f"[SUCCESS] Tunnel established. Using API URL: {api_url}", flush=True)
 
-            # Send the image to the API.
-            with open(image_path, "rb") as img:
-                files = {"file": img}
-                response = requests.post(api_url, files=files, timeout=10)
+        # Send the image to the API.
+        with open(image_path, "rb") as img:
+            files = {"file": img}
+            response = requests.post(api_url, files=files, timeout=200)
 
-            print(f"[DEBUG] API Response Status Code: {response.status_code}", flush=True)
-            print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging
+        print(f"[DEBUG] API Response Status Code: {response.status_code}", flush=True)
+        print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging
 
-            return response.json()
+        return response.json()
 
     except Exception as e:
         print("[ERROR] Failed to create SSH tunnel!", flush=True)

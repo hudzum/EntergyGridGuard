@@ -23,9 +23,13 @@ The base-64 encoded ssh private key. must be a valid ecdsa key readable by param
 ## Frontend Server (container name server)
 
 ### SSL_KEY
+*OBSOLETE*
+
 The base-64 encoded ssl key. Must be a valid PEM private key file readable by nginx.
 
 ### SSL_CRT
+*OBSOLETE*
+
 The base-64 encoded ssl certificate. Must be a valid PEM certificate file readable by nginx.
 
 ### DEFAULT_USER, DEFAULT_PASS

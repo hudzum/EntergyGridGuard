@@ -34,6 +34,7 @@ services:
       - POSTGRES_PASSWORD
       - SSH_USERNAME
       - SSH_KEY
+      - AI_API_URL
     ports:
       - "8080:80"
     image: muhammedhab/backend_service:latest
