@@ -4,8 +4,10 @@ services:
     container_name: postgres_container
     image: postgres
     restart: always
-    env_file:
-      - .env
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
 
