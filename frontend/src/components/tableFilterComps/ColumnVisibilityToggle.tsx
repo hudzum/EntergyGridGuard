@@ -14,7 +14,7 @@ export function ColumnVisibilityToggle({ table }: { table: Table<any> }) {
     'components_customer night lights_condition',
     'components_fault indicators_condition',
     'components_guy wires_condition',
-    'actions',
+    
   ];
 
   useEffect(() => {

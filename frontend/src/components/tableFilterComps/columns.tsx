@@ -145,7 +145,7 @@ export const columns: ColumnDef<Pole>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
 
-            <Dialog>
+            <Dialog className = "max-h-[80vh] overflow-scroll">
               <DialogTrigger asChild>
                 <span className="">View Image details</span>
               </DialogTrigger>

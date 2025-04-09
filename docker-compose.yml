@@ -27,7 +27,6 @@ services:
     volumes:
       - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/root/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
       - ~/.ssh/GIZMO_SSH_KEY_samuel_goodwin:/root/.ssh/GIZMO_SSH_KEY_samuel_goodwin:ro
-      - C:/Users/Elswo/.ssh:/app/.ssh
     build: ./backend
     container_name: backend_service
     restart: always
