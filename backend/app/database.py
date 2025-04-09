@@ -2,7 +2,7 @@ import base64
 import os
 from dotenv import load_dotenv, find_dotenv
 from datetime import datetime, timezone
-from sqlalchemy import create_engine, Column, Integer, LargeBinary, DateTime, JSON
+from sqlalchemy import create_engine, Column, Integer, LargeBinary, DateTime, JSON, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
@@ -30,8 +30,11 @@ class Picture(Base):
     thumbnail = Column(LargeBinary)
     components = Column(JSON, default={})
     time_created = Column(DateTime, default=datetime.now(timezone.utc))
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
 Base.metadata.create_all(bind=engine)
+
 
 # Function to get a database session
 def get_db():
@@ -42,17 +45,20 @@ def get_db():
         db.close()
 
 # Function to save an image to the database with its components
-def save_image_to_db(image_data: bytes, thumbnail_data: bytes, components: dict = None):
+def save_image_to_db(image_data: bytes, thumbnail_data: bytes, components: dict = None, latitude_data: float = None, longitude_data: float = None):
     """Saves image binary data to the database with empty 'components' and current timestamp."""
     db = next(get_db())  # Get the database session
     if components is None:
         components = {}
+
     try:
         # Create a new Picture object (Leave components as empty for initial testing)
         picture = Picture(
             picture=image_data,
             thumbnail=thumbnail_data,
             components=components,
+            latitude=latitude_data,
+            longitude=longitude_data,
             time_created=datetime.now(timezone.utc)
         )
 
@@ -80,7 +86,9 @@ def get_image_metadata(db: Session):
         Picture.id,
         Picture.time_created,
         Picture.components,
-        Picture.thumbnail
+        Picture.thumbnail,
+        Picture.longitude,
+        Picture.latitude,
     ).all()
         
     images = []
@@ -93,7 +101,9 @@ def get_image_metadata(db: Session):
             "id": picture.id,
             "time_created": picture.time_created.isoformat(),
             "components": picture.components,
-            "thumbnail": encoded_thumbnail
+            "thumbnail": encoded_thumbnail,
+            "latitude": picture.latitude,
+            "longitude": picture.longitude,
         })
     return images
 
