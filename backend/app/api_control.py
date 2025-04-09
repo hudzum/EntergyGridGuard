@@ -17,17 +17,25 @@ SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
 API_DIRECTORY = os.getenv("API_DIRECTORY")
 API_SCRIPT = "run_qwen.py"
 
-REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
+REMOTE_BIND_ADDRESS = ("0.0.0.0", 5354)
 LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
+
 
 def start_api():
     """Starts the FastAPI application on the remote server and waits until it is fully ready."""
-    command = (
-        f"source /home/samuel_goodwin/miniconda3/etc/profile.d/conda.sh && "
-        f"conda activate llm_production && "
-        f"cd {API_DIRECTORY} && "
-        f"(nohup python3 {API_SCRIPT} > api.log 2>&1 & echo $!)"
-    )
+    command = f'''
+    bash -c '
+    source /home/{SSH_USERNAME}/miniconda3/etc/profile.d/conda.sh
+    if ! conda info --envs | grep -q "^llm_production"; then
+        conda create -y --name llm_production
+    fi
+    conda activate llm_production
+    pip install fastapi uvicorn transformers torch pillow
+    cd {API_DIRECTORY}
+    nohup python3 {API_SCRIPT} > api.log 2>&1 &
+    echo $!
+    '
+    '''
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -63,7 +71,7 @@ def start_api():
         for attempt in range(max_retries):
             try:
                 # Run curl inside the SSH connection to check the API
-                check_command = f"curl -s -o /dev/null -w '%{{http_code}}' http://127.0.0.1:5353/"
+                check_command = f"curl -s -o /dev/null -w '%{{http_code}}' http://127.0.0.1:5354/"
                 stdin, stdout, stderr = ssh.exec_command(check_command)
                 response_code = stdout.read().decode().strip()
 
@@ -72,8 +80,10 @@ def start_api():
                     ssh.close()
                     return pid
             except Exception as e:
-                print(f"[WAIT] API not ready yet (Attempt {attempt + 1}/{max_retries}). Retrying in {wait_time} seconds...", flush=True)
-            
+                print(
+                    f"[WAIT] API not ready yet (Attempt {attempt + 1}/{max_retries}). Retrying in {wait_time} seconds...",
+                    flush=True)
+
             time.sleep(wait_time)
 
         print("[ERROR] API did not start within the expected time.", flush=True)
@@ -88,10 +98,10 @@ def start_api():
 def stop_api():
     """Stops the FastAPI application running on the remote server."""
     command = f"pkill -f {API_SCRIPT}"
-    
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    
+
     try:
         ssh.connect(SSH_HOST, username=SSH_USERNAME, key_filename=SSH_KEY_PATH, port=34130)
         stdin, stdout, stderr = ssh.exec_command(command)
