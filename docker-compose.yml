@@ -5,8 +5,8 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
@@ -25,11 +25,13 @@ services:
     env_file:
       - .env
     volumes:
-      - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/app/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
+      - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/root/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
       - ~/.ssh/GIZMO_SSH_KEY_samuel_goodwin:/root/.ssh/GIZMO_SSH_KEY_samuel_goodwin:ro
     build: ./backend
     container_name: backend_service
     restart: always
+    environment:
+      DATABASE_URL: ${PGHOST}
     ports:
       - "80:80"
 
