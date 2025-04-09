@@ -16,17 +16,17 @@ import base64
 import logging
 load_dotenv(find_dotenv())
 
-SSH_HOST = "45.21.85.155"
-SSH_PORT = 34130
+# SSH_HOST = "45.21.85.155"
+# SSH_PORT = 34130
 # Define environmental variables for your own GIZMO username and ssh key path.
-SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_KEY = os.getenv("SSH_KEY")
+# SSH_USERNAME = os.getenv("SSH_USERNAME")
+# SSH_KEY = os.getenv("SSH_KEY")
 import io
 
-ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
+# ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
 
-REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
-LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
+# REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
+# LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -85,7 +85,7 @@ def send_image(image_path):
     and returns the parsed JSON response from the API.
     """
     try:
-        print(f"[INFO] Attempting SSH tunnel to {SSH_HOST}:{SSH_PORT} with {SSH_USERNAME}...", flush=True)
+        print(f"[INFO] Attempting connect api...", flush=True)
 #         print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
 
         api_url = f"{API_URL}{API_ENDPOINT}"  # **Use 127.0.0.1**

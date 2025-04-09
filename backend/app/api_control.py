@@ -1,27 +1,27 @@
-import paramiko
-import time
-import os
-import sys
-import base64
+# import paramiko
+# import time
+# import os
+# import sys
+# import base64
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-SSH_HOST = "45.21.85.155"
-SSH_PORT = 34130
+# SSH_HOST = "45.21.85.155"
+# SSH_PORT = 34130
 # Define environmental variables for your own GIZMO username and ssh key path.
-SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_KEY = os.getenv("SSH_KEY")
+# SSH_USERNAME = os.getenv("SSH_USERNAME")
+# SSH_KEY = os.getenv("SSH_KEY")
 
 import io
 
-ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
+# ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
 
-API_DIRECTORY = os.getenv("API_DIRECTORY")
-API_SCRIPT = "run_qwen.py"
+# API_DIRECTORY = os.getenv("API_DIRECTORY")
+# API_SCRIPT = "run_qwen.py"
 
-REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
-LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
+# REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
+# LOCAL_BIND_ADDRESS = ("0.0.0.0", 0)
 
 def start_api():
     """Starts the FastAPI application on the remote server and waits until it is fully ready."""
