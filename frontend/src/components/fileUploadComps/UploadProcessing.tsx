@@ -3,7 +3,7 @@ export default function UploadProcessing ({imageId, setStatus, setImageDetails, 
     const fetchImageDetails = async (imageId: number) => {
         console.log("Fetching Image Details");
         try {
-          const response = await fetch(`http://localhost:80/api/images/${imageId}`);
+          const response = await fetch(`/api/images/${imageId}`);
           if (response.ok) {
             const data = await response.json();
             if (data.id) {
@@ -24,7 +24,7 @@ export default function UploadProcessing ({imageId, setStatus, setImageDetails, 
       const fetchImage = async (imageId: number) => {
         console.log("Fetching Image Src");
         try {
-          const response = await fetch(`http://localhost:80/api/images/${imageId}/data`);
+          const response = await fetch(`/api/images/${imageId}/data`);
           if (response.ok) {
             // Get the binary response as a Blob
             const blob = await response.blob();

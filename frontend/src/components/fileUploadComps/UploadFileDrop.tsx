@@ -27,7 +27,7 @@ export default function UploadFileDrop({setImageId, setStatus}): JSX.Element {
 
     try {
       setStatus("processing")
-      const response = await fetch("http://localhost:80/api/upload", {
+      const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });

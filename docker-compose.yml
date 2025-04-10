@@ -22,18 +22,16 @@ services:
         - "5050:80"
 
   backend:
-    env_file:
-      - .env
     volumes:
-      - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/root/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
+      - ~/.ssh/GIZMO_SSH_KEY_hudson_vu:/app/.ssh/GIZMO_SSH_KEY_hudson_vu:ro
       - ~/.ssh/GIZMO_SSH_KEY_samuel_goodwin:/root/.ssh/GIZMO_SSH_KEY_samuel_goodwin:ro
     build: ./backend
     container_name: backend_service
     restart: always
-    environment:
-      DATABASE_URL: ${PGHOST}
+    env_file:
+      - .env
     ports:
-      - "80:80"
+      - "8080:80"
 
   frontend:
     build: ./frontend
@@ -43,3 +41,16 @@ services:
       - backend
     ports:
       - "3000:3000"
+
+
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    env_file:
+      - .env

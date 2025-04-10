@@ -11,25 +11,27 @@ import json
 from PIL import Image
 import piexif
 import io
+import paramiko
+import base64
 import logging
 load_dotenv(find_dotenv())
 
-SSH_HOST = "45.21.85.155"
-SSH_PORT = 34130
+# SSH_HOST = "45.21.85.155"
+# SSH_PORT = 34130
 # Define environmental variables for your own GIZMO username and ssh key path.
-SSH_USERNAME = os.getenv("SSH_USERNAME")
-SSH_KEY_PATH = os.getenv("SSH_KEY_PATH")
+# SSH_USERNAME = os.getenv("SSH_USERNAME")
+# SSH_KEY = os.getenv("SSH_KEY")
+import io
 
-file_path = r"C:\Users\Elswo\.ssh\GIZMO_SSH_KEY_zachary_pham"
-if os.path.exists(file_path):
-    print(f"File exists at {file_path}")
-else:
-    print(f"File does not exist at {file_path}")
+# ssh_pkey = paramiko.ECDSAKey.from_private_key(io.StringIO(str(base64.b64decode(SSH_KEY), "utf-8")))
 
-SSH_KEY_PATH = os.path.expanduser(SSH_KEY_PATH)
+# REMOTE_BIND_ADDRESS = ("0.0.0.0", 5353)
+# LOCAL_BIND_ADDRESS = ("0.0.0.0", 9999)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+API_URL = os.getenv("AI_API_URL")
 
 API_ENDPOINT = "/analyze-image/"
 
@@ -98,30 +100,21 @@ def send_image(image_path):
     and returns the parsed JSON response from the API.
     """
     try:
-        print(f"[INFO] Attempting SSH tunnel to {SSH_HOST}:{SSH_PORT} with {SSH_USERNAME}...", flush=True)
-        print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
+        print(f"[INFO] Attempting connect api...", flush=True)
+#         print(f"[INFO] SSH Key Path: {SSH_KEY_PATH}", flush=True)
 
-        with SSHTunnelForwarder(
-            (SSH_HOST, SSH_PORT),
-            ssh_username=SSH_USERNAME,
-            ssh_pkey=SSH_KEY_PATH,
-            remote_bind_address=("127.0.0.1", 5354),  # **Use 127.0.0.1 instead of 0.0.0.0**
-            local_bind_address=("127.0.0.1", 9999)  # **Bind locally to 127.0.0.1**
-        ) as tunnel:
-            # SSH tunnel is now established.
-            local_port = tunnel.local_bind_port
-            api_url = f"http://127.0.0.1:9999{API_ENDPOINT}"  # **Use 127.0.0.1**
-            print(f"[SUCCESS] Tunnel established. Using API URL: {api_url}", flush=True)
+        api_url = f"{API_URL}{API_ENDPOINT}"  # **Use 127.0.0.1**
+        print(f"[SUCCESS] Tunnel established. Using API URL: {api_url}", flush=True)
 
-            # Send the image to the API.
-            with open(image_path, "rb") as img:
-                files = {"file": img}
-                response = requests.post(api_url, files=files, timeout=30)
+        # Send the image to the API.
+        with open(image_path, "rb") as img:
+            files = {"file": img}
+            response = requests.post(api_url, files=files, timeout=200)
 
-            print(f"[DEBUG] API Response Status Code: {response.status_code}", flush=True)
-            print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging
+        print(f"[DEBUG] API Response Status Code: {response.status_code}", flush=True)
+        print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging
 
-            return response.json()
+        return response.json()
 
     except Exception as e:
         print("[ERROR] Failed to create SSH tunnel!", flush=True)
