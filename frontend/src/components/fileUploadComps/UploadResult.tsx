@@ -7,7 +7,7 @@ import { Badge } from "../ui/badge";
 export default function UploadResult ({ imageDetails, imageSrc}) {
 
   const getConditionColor = (condition: string) => {
-    switch (condition.toLowerCase()) {
+    switch (condition?.toLowerCase()) {
       case 'good':
         return 'bg-green-500';
       case 'fair':
