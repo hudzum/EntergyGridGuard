@@ -1,6 +1,7 @@
 import { Loader } from "lucide-react"
+import {useEffect} from "react";
 export default function UploadProcessing ({imageId, setStatus, setImageDetails, setImageSrc}) {
-    const fetchImageDetails = async (imageId: number) => {
+    const fetchImageDetails = async (imageId: number): Promise<boolean> => {
         console.log("Fetching Image Details");
         try {
           const response = await fetch(`/api/images/${imageId}`);
@@ -12,6 +13,7 @@ export default function UploadProcessing ({imageId, setStatus, setImageDetails, 
               
               fetchImage(data.id);
               console.log(data);
+                return true;
             }
           } else {
             console.error('Error fetching image details:', response.statusText);
@@ -19,6 +21,8 @@ export default function UploadProcessing ({imageId, setStatus, setImageDetails, 
         } catch (error) {
           console.error('Error fetching image details:', error);
         }
+        console.log('return');
+        return false;
       };
       
       const fetchImage = async (imageId: number) => {
@@ -40,7 +44,18 @@ export default function UploadProcessing ({imageId, setStatus, setImageDetails, 
         }
       };
 
-    fetchImageDetails(imageId);
+    useEffect(() => {
+        let keepGoing = true;
+        function getImage() {
+            console.log("Get Image");
+            fetchImageDetails(imageId).then(good => !good && keepGoing && setTimeout(getImage, 300));
+            console.log("Get Image 12");
+        }
+
+        getImage();
+        return () => {
+            keepGoing = false ;};
+    }, [imageId]);
 
     return <div className ="text-black  flex flex-col items-center justify-center space-y-4 p-8">
         

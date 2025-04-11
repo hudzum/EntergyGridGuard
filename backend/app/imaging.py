@@ -95,7 +95,6 @@ def extract_lat_long(image_path):
         return None
 
 import base64
-import json
 
 from openai import OpenAI
 def send_image(image_path):
@@ -119,7 +118,6 @@ def send_image(image_path):
 #         print(f"[DEBUG] API Response Content: {response.text[:500]}", flush=True)  # Trim output for debugging
 #
 #         return response.json()
-        
         client = OpenAI(
             base_url=API_URL,
             api_key="sk-T8v95KvU5X4laJng0VoNPjmR4o7tNG8mPT4fS18ZV6fKWh62",
@@ -127,7 +125,9 @@ def send_image(image_path):
         
         with open(image_path, "rb") as f:
             image = base64.b64encode(f.read()).decode("utf-8")
-        
+
+        print('sending api request')
+
         response = client.chat.completions.create(
             model="qwen2.5-vl-7b-instruct",
             messages=[
@@ -300,10 +300,12 @@ def send_image(image_path):
                 }
             ]
         )
+
+        json_str = response.choices[0].message.content.replace("```json", '').replace('```', '').replace('\r', '').replace('\n', '')
+        print('startjson' + json_str + 'endjson')
         
-        print(response.choices[0].message.content)
-        
-        print(json.loads(response.choices[0].message.content.replace("```json", '').replace('```', '')))
+        json_val = json.loads(json_str)
+        return json_val
 
     except Exception as e:
             print("[ERROR] Failed to create SSH tunnel!", flush=True)
@@ -315,23 +317,24 @@ def parse_response(response):
     Parses the 'response' key in the returned JSON from the API, attempting to extract valid JSON content.
     Returns the parsed JSON object or None if parsing fails.
     """
-    response_str = response.get("response", "")
-    if isinstance(response_str, list) and response_str:
-        response_str = response_str[0]
-
-    # Attempt to extract JSON content from response.
-    match = re.search(r"```json\s*(\{.*\})\s*```", response_str, re.DOTALL)
-    if match:
-        json_content = match.group(1)
-    else:
-        json_content = response_str.strip()
-
-    try:
-        parsed_json = json.loads(json_content)
-        return parsed_json
-    except Exception as e:
-        print("Error parsing JSON:", e)
-        return None
+    # response_str = response.get("response", "")
+    # if isinstance(response_str, list) and response_str:
+    #     response_str = response_str[0]
+    #
+    # # Attempt to extract JSON content from response.
+    # match = re.search(r"```json\s*(\{.*\})\s*```", response_str, re.DOTALL)
+    # if match:
+    #     json_content = match.group(1)
+    # else:
+    #     json_content = response_str.strip()
+    #
+    # try:
+    #     parsed_json = json.loads(json_content)
+    #     return parsed_json
+    # except Exception as e:
+    #     print("Error parsing JSON:", e)
+    #     return None
+    return response
 
 async def upload_image(file: UploadFile = File(...)):
     try:

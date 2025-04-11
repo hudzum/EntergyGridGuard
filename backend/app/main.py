@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.orm import Session
 from .imaging import upload_image
-from .database import get_image_by_id, get_db, get_image_metadata, get_thumbnail_by_id
+from .database import get_image_by_id, get_db, get_image_metadata, get_thumbnail_by_id, get_image_details
 from io import BytesIO
 
 app = FastAPI()
@@ -38,25 +38,25 @@ async def upload(file: UploadFile = File(...)):
 #         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
 
 
-# @app.get("/api/images/{image_id}")
-# def get_image_detail(image_id: int, db: Session = Depends(get_db)):
-#     """Returns FULL details of an image, including its components and actual data."""
-#     image_details = get_image_details(db, image_id)
-#     if image_details is None:
-#         raise HTTPException(status_code=404, detail="Image not found")
-#
-#     return image_details
+@app.get("/api/images/{image_id}")
+def get_image_detail(image_id: int, db: Session = Depends(get_db)):
+    """Returns FULL details of an image, including its components and actual data."""
+    image_details = get_image_details(db, image_id)
+    if image_details is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return image_details
 
 
-# @app.get("/api/images/{image_id}/data")
-# def get_image_binary(image_id: int, db: Session = Depends(get_db)):
-#     """Returns ONLY the image binary data for direct access when needed."""
-#     image_data = get_image_by_id(db, image_id)
-#     if image_data is None:
-#         raise HTTPException(status_code=404, detail="Image not found")
-#
-#     # Use StreamingResponse to send the image in binary format to the client
-#     return StreamingResponse(BytesIO(image_data), media_type="image/png")
+@app.get("/api/images/{image_id}/data")
+def get_image_binary(image_id: int, db: Session = Depends(get_db)):
+    """Returns ONLY the image binary data for direct access when needed."""
+    image_data = get_image_by_id(db, image_id)
+    if image_data is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    # Use StreamingResponse to send the image in binary format to the client
+    return StreamingResponse(BytesIO(image_data), media_type="image/png")
 
 @app.get("/api/images-meta")
 async def fetech_images_meta(db: Session = Depends(get_db)):

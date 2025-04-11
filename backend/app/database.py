@@ -114,6 +114,19 @@ def get_image_by_id(db: Session, image_id: int):
         return image.picture
     return None
 
+def get_image_details(db: Session, image_id: int):
+    """Fetch all details of a single image except binary data."""
+    image = db.query(Picture).filter(Picture.id == image_id).first()
+    if image:
+        return {
+            "id": image.id,
+            "components": image.components,
+            "time_created": image.time_created.isoformat(),
+            "latitude": image.latitude,
+            "longitude": image.longitude,
+        }
+    return None
+
 def get_thumbnail_by_id(db: Session, image_id: int):
     """Fetch the thumbnail binary data by its ID and return it as Base64 encoded."""
     image = db.query(Picture).filter(Picture.id == image_id).first()
