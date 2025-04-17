@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {useEffect, useLayoutEffect, useRef} from "react";
 
 const getConditionColor = (condition: string) => {
   switch (condition.toLowerCase()) {
@@ -104,12 +105,24 @@ export const columns: ColumnDef<Pole>[] = [
             alt={`Pole ${row.original.id} thumbnail`}
             className="w-12 h-12 object-cover rounded cursor-pointer"
           />
-          <div className="absolute hidden group-hover:block top-0 left-0 z-10">
-            <img 
-              src={`data:image/jpeg;base64,${thumbnail}`} 
-              alt={`Pole ${row.original.id}`}
-              className="w-48 h-48 object-cover rounded shadow-lg border-2 border-white"
-            />
+          <div className="absolute hidden group-hover:block top-0 left-0 z-10" style={{width: 500}}>
+            <div className="grid grid-cols-2 gap-2">
+              <img src={`/api/images/${row.original.id}/data`} style={{width: '100%', height: '100%'}}/>
+              <div style={{position: 'relative', width: '100%', height: '100%'}}>
+                <img src={`/api/images/${row.original.id}/data`} />
+                <p style={{textAlign: 'left', top: 0, left: 0, width: '100%', lineHeight: '12px', textTransform: 'capitalize', height: '100%', position: 'absolute', padding: 5, color: 'orange', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', fontWeight: 'bold'}}>
+                  {Object.entries(row.original.components).filter(([, data]) => data.quantity > 0).map(([name, data]) => (
+                      <>
+                        <span style={{margin: 0, }}>{name} ({data.quantity}) - </span>
+                        <span style={{margin: 0, color: ({bad: 'oklch(0.637 0.237 25.331)', good: 'oklch(0.723 0.219 149.579)', unknown: 'oklch(0.551 0.027 264.364)'}[data.condition] ?? 'white')}}>{data.condition}</span>
+                        <br />
+                        <span style={{margin: '0 0 0 20px', fontSize: 8}}>{data.description}</span>
+                        <br />
+                      </>
+                  ))}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -183,13 +196,30 @@ export const columns: ColumnDef<Pole>[] = [
                     Detailed overview of all components and their current status.
                   </DialogDescription>
                 </DialogHeader>
-                
+
                 <Card className="w-full shadow">
                   <CardTitle className="text-xl font-bold text-center">
                     Components Status Pole #{pole.id}
                   </CardTitle>
-                
+
                   <CardContent className="p-6">
+                    <div className="grid grid-cols-2 gap-2">
+                      <img src={`/api/images/${pole.id}/data`} style={{width: '100%', height: '100%'}}/>
+                      <div style={{position: 'relative', width: '100%', height: '100%'}}>
+                        <img src={`/api/images/${pole.id}/data`} />
+                        <p style={{top: 0, left: 0, width: '100%', lineHeight: '12px', textTransform: 'capitalize', height: '100%', position: 'absolute', padding: 5, color: 'orange', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', fontWeight: 'bold'}}>
+                          {Object.entries(pole.components).filter(([, data]) => data.quantity > 0).map(([name, data]) => (
+                              <>
+                                <span style={{margin: 0, }}>{name} ({data.quantity}) - </span>
+                                <span style={{margin: 0, color: ({bad: 'oklch(0.637 0.237 25.331)', good: 'oklch(0.723 0.219 149.579)', unknown: 'oklch(0.551 0.027 264.364)'}[data.condition] ?? 'white')}}>{data.condition}</span>
+                                <br />
+                                <span style={{margin: '0 0 0 20px', fontSize: 8}}>{data.description}</span>
+                                <br />
+                              </>
+                          ))}
+                        </p>
+                      </div>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {pole.components && Object.entries(pole.components).map(([name, data]) => (
                         <Card key={name} className="overflow-hidden">
@@ -214,7 +244,7 @@ export const columns: ColumnDef<Pole>[] = [
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <DialogFooter>
                   <Button type="button">Close</Button>
                   <Button type="button" variant="outline">Generate Report</Button>
