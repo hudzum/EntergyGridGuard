@@ -144,7 +144,6 @@ const QueryPage = () => {
 
   const conditions = ["Good", "Bad", "Unknown", "Any"];
 
-
   const handleSelectChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
@@ -191,58 +190,68 @@ const QueryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-300 flex flex-col w-full">
+    <div className="min-h-screen bg-zinc-300 flex flex-col w-full ">
       <Navbar />
-      <div className="flex justify-between m-2 align-center ">
-        <Card className="shadow-lg bg-zinc-50 text-black border-1 border-rose-500 w-75 h-75 flex-none p-2">
-          <CardContent className="p-4 space-y-4 text-black">
-            <h2 className="text-xl font-semibold">Search Assets</h2>
-
-            <Select
-              onValueChange={(value) => handleSelectChange("assetType", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Asset Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {assetTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              onValueChange={(value) => handleSelectChange("condition", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Condition" />
-              </SelectTrigger>
-              <SelectContent>
-                {conditions.map((cond) => (
-                  <SelectItem key={cond} value={cond}>
-                    {cond}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-          
-
-          
-            <Button
-              className="w-full bg-rose-500 text-white"
-              onClick={handleSearch}
-            >
-              Search
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="border-violet-700 border-t-4 w-250 flex-1">
+      <div className="flex justify-between m-10 align-center ">
+        <Card className="border-violet-700 border-t-8  w-250 flex-1">
           <h2 className="text-2xl font-semibold">Utility Pole Inventory</h2>
-          <div className="relative">
+
+          {/*Search/Filter by Assets Section */}
+          <Card className="flex flex-col shadow-lg bg-zinc-50 text-black border-1 border-rose-500 p-2 ml-10 w-4/12">
+            <CardContent className="p-4 space-y-4 text-black">
+              <h2 className="text-xl font-semibold">Search Assets</h2>
+              <div className="flex flex-row gap-4">
+
+                <div className = "flex-1">
+                <Select
+                  onValueChange={(value) =>
+                    handleSelectChange("assetType", value)
+                  }
+                  
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Asset Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {assetTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                </div>
+
+                <div className ="flex-1">
+                <Select
+                  onValueChange={(value) =>
+                    handleSelectChange("condition", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {conditions.map((cond) => (
+                      <SelectItem key={cond} value={cond}>
+                        {cond}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+                <Button
+                  className=" bg-rose-500 text-white flex-1"
+                  onClick={handleSearch}
+                >
+                  Search
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/*hover image */}
+          <div className="relative mx-5">
             {/* Displaying Thumbnail on Hover */}
             {hoveredPoleId && (
               <div
@@ -255,14 +264,16 @@ const QueryPage = () => {
               >
                 <img
                   src={
-                    poles.find((pole) => pole.id === hoveredPoleId)?.thumbnail ||
-                    ""
+                    poles.find((pole) => pole.id === hoveredPoleId)
+                      ?.thumbnail || ""
                   }
                   alt="Thumbnail"
                   className="h-24 w-24 object-cover"
                 />
               </div>
             )}
+
+            {/*Actual Table*/}
             <DataTable
               columns={columns}
               data={poles}

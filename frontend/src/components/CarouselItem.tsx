@@ -37,12 +37,12 @@ export const CarChild: React.FC<ImageTextDescriptionProps> = ({
     <Card className="w-full max-w-4xl">
       <CardContent className="grid md:grid-cols-2 gap-6 p-6">
         {/* Image Section */}
-        <div className="flex items-center justify-center bg-gray-100 rounded-lg">
+        <div className="flex items-center justify-center bg-gray-100 ">
           {imagePath ? (
             <img 
               src={imagePath} 
               alt="Description" 
-              className="max-h-[400px] max-w-full object-contain rounded-lg"
+              className="max-h-[400px] max-w-full object-contain"
             />
           ) : (
             <div className="text-gray-500 text-center p-6">

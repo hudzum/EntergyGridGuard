@@ -21,12 +21,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { ColumnVisibilityToggle } from "./ColumnVisibilityToggle"
  
  
@@ -61,9 +55,7 @@ export function DataTable<TData, TValue>({
  
   return (
     <div>
-      <div className="flex justify-end space-x-2 py-4 m-3">
-      <ColumnVisibilityToggle table = {table}/>
-        </div>
+      
     <div className="rounded-md border">
       <Table>
         <TableHeader >
@@ -126,6 +118,9 @@ export function DataTable<TData, TValue>({
           Next
         </Button>
       </div>
+      <div className="flex justify-end space-x-2 py-4 m-3">
+      <ColumnVisibilityToggle table = {table}/>
+        </div>
 
     </div>
   )

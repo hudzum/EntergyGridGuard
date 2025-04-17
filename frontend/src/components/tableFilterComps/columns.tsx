@@ -60,6 +60,7 @@ export type Pole = {
     capacitors?: ComponentDetails;
     'fault indicators'?: ComponentDetails;
   };
+  thumbnail?: string;
 };
 
 const createComponentColumn = (componentName: keyof Pole['components']) => ({
@@ -90,9 +91,35 @@ export const columns: ColumnDef<Pole>[] = [
     size: 10,
   },
   {
+    accessorKey: "thumbnail",
+    header: "Image",
+    cell: ({ row }) => {
+      const thumbnail = row.original.thumbnail;
+      if (!thumbnail) return <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">No image</div>;
+      
+      return (
+        <div className="relative group">
+          <img 
+            src={`data:image/jpeg;base64,${thumbnail}`} 
+            alt={`Pole ${row.original.id} thumbnail`}
+            className="w-12 h-12 object-cover rounded cursor-pointer"
+          />
+          <div className="absolute hidden group-hover:block top-0 left-0 z-10">
+            <img 
+              src={`data:image/jpeg;base64,${thumbnail}`} 
+              alt={`Pole ${row.original.id}`}
+              className="w-48 h-48 object-cover rounded shadow-lg border-2 border-white"
+            />
+          </div>
+        </div>
+      );
+    },
+    size: 100,
+  },
+  {
     accessorKey: "status",
     header: "Status",
-    size: 100,
+    size: 50,
   },
   {
     accessorKey: "date",
@@ -109,8 +136,8 @@ export const columns: ColumnDef<Pole>[] = [
       const date = new Date(row.getValue("date"));
       return <div className="text-right">{date.toLocaleDateString("en-US")}</div>;
     },
-    size: 100, 
-    maxSize: 120,
+    size: 50, 
+    maxSize: 50,
   },
 
   createComponentColumn('pole'),

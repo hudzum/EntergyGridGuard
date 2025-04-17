@@ -1,6 +1,7 @@
 import React from "react";
-import { Navbar } from "./components/NavBar";
+import { IconRow, Navbar } from "./components/NavBar";
 import { Button } from "./components/ui/button";
+
 import {
   Carousel,
   CarouselContent,
@@ -10,18 +11,15 @@ import {
 } from "./components/ui/carousel";
 import CarChild from "./components/CarouselItem";
 import Autoplay from "embla-carousel-autoplay";
-import { Card } from "./components/ui/card";
 function App() {
   return (
     <div className="min-h-screen bg-zinc-300 flex flex-col w-full">
-      {/* Navbar should be outside the main content container */}
       <Navbar />
 
-      {/* Main content section */}
-      <main className="flex-grow flex items-center justify-center w-full px-4 py-8">
-        <div className="bg-zinc-50  rounded-lg shadow-lg overflow-hidden">
+      <main className="flex-col flex items-center justify-center w-full px-4 py-8">
+        <div className="bg-zinc-50   rounded-lg shadow-lg overflow-hidden">
           <div className="flex flex-col items-center py-12 px-4 md:px-8 lg:px-12">
-            {/* Hero content */}
+            {/* Main title */}
             <div className="text-center w-full max-w-3xl mx-auto mb-12">
               <h1 className="text-3xl md:text-5xl font-bold mb-6 text-black">
                 <span className="text-transparent bg-gradient-to-r from-purple-600 to-rose-500 bg-clip-text">
@@ -36,20 +34,20 @@ function App() {
               <Button className="bg-rose-500">Learn More</Button>
             </div>
 
-            <div className=" relative w-full flex flex-col items-center justify-center m-4">
+            <div className=" relative w-full flex flex-col items-center justify-center mt-4 ">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-[90%] h-40 bg-rose-500/30 rounded-full blur-3xl"></div>
 
               <Carousel
                 className="max-w-4xl w-full"
                 plugins={[
                   Autoplay({
-                    delay: 2000,
+                    delay: 10000,
                   }),
                 ]}
               >
                 <CarouselContent>
                   <CarouselItem>
-                    <div className="flex justify-center p-4">
+                    <div className="flex justify-center p-4 ">
                       <CarChild
                         imagePath="./carousel/carousel1.png"
                         initialTitle="LLM-Powered Damage Analytics"
@@ -92,28 +90,28 @@ function App() {
             </div>
           </div>
 
+          {/* Navigation Icons Links */}
+          <IconRow />
+
           {/*About Us*/}
-          <div className=" flex flex-col w-full max-w-4xl items-center justify-center text-center">
-            <h1 className="text-2xl md:text-3xl font-bold mb-6 text-black">
-              About Us
-            </h1>
-            
+
+          {/*About Us*/}
+          <div className="flex flex-col w-full max-w-4xl items-center justify-center text-center mx-auto mt-4">
+            <h2 className="text-xl font-bold mb-6 text-black">About Us</h2>
+
             <img
               src="./team.jpeg"
               alt="dashboard"
-              className=" w-2/3 rounded-lg border border-gray-200 shadow-lg"
+              className=" w-2/3 rounded-lg border border-gray-200 shadow-lg mb-4"
             />
 
-            <Card>
-              <p className="text-zinc-600 text-sm mb-8 max-w-2xl mx-auto">
-                We are a team of LSU students passionate about leveraging AI to
-                solve real-world challenges. Collaborating with experienced
-                mentors from Entergy, Our goal is to streamline damage
-                assessment with intelligent databases, AI-powered analytics, and
-                automated reporting—helping industries make faster, data-driven
-                decisions.
-              </p>
-            </Card>
+            <p className="text-zinc-600 text-sm mb-8 max-w-2xl mx-auto">
+              We are a team of LSU students passionate about leveraging AI to
+              solve real-world challenges. Collaborating with experienced
+              mentors from Entergy, Our goal is to streamline damage assessment
+              with intelligent databases, AI-powered analytics, and automated
+              reporting—helping industries make faster, data-driven decisions.
+            </p>
           </div>
         </div>
       </main>

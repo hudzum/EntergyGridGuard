@@ -46,7 +46,8 @@ export default function UploadFileDrop({setImageId, setStatus}): JSX.Element {
       setMessage(`❌ Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`);
     }
   };
-
+  
+  
   const { getRootProps, getInputProps, open, acceptedFiles } = useDropzone({
     onDrop: (incomingFiles: File[], fileRejections: FileRejection[]) => {
       setFiles(incomingFiles);
@@ -71,6 +72,11 @@ export default function UploadFileDrop({setImageId, setStatus}): JSX.Element {
       "image/*": [".png", ".jpeg", ".jpg"],
     } as Accept,
   });
+  const handleDropzoneClick = (e:any) => {
+    console.log("Being clicked");
+    e.stopPropagation();
+    open();
+  };
 
   const fileItems = acceptedFiles.map((file: File) => (
     <li key={file.name} className="text-sm text-gray-700">
@@ -83,7 +89,9 @@ export default function UploadFileDrop({setImageId, setStatus}): JSX.Element {
       <div
         {...getRootProps()}
         className="border-2 border-dashed border-blue-500 rounded-lg p-6 text-center cursor-pointer hover:bg-blue-50"
+        onClick={handleDropzoneClick}
       >
+        <Button onClick={open} className="mt-2">Browse Files</Button>
         <Upload className="w-12 h-12 mb-4 mx-auto text-gray-600" />
         <input {...getInputProps()} ref={hiddenInputRef} />
         <p className="text-gray-600">

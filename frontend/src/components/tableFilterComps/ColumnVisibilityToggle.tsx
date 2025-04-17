@@ -30,7 +30,7 @@ export function ColumnVisibilityToggle({ table }: { table: Table<any> }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="ml-auto">
-          Columns
+          Edit Columns
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
