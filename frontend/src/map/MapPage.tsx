@@ -50,12 +50,14 @@ export const MapPage: React.FC = () => {
                     const highlighted = readyImages?.find(image => image.id === parseInt(highlightPole))
                     if (highlighted) {
                         setSidebarImage(highlighted);
-                        setPos({
-                            center: [highlighted.longitude, highlighted.latitude], // Initial map center [lng, lat]
-                            zoom: 17, // Initial zoom level
-                            pitch: 76,
-                            bearing: 76,
-                        });
+                        setTimeout(() => {
+                            setPos({
+                                center: [highlighted.longitude, highlighted.latitude], // Initial map center [lng, lat]
+                                zoom: 16, // Initial zoom level
+                                pitch: 76,
+                                bearing: 76,
+                            });
+                        }, 200);
                         setStarted(true);
                     }
                 }
@@ -103,7 +105,7 @@ export const MapPage: React.FC = () => {
     function startMap() {
         setPos({
             center: sidebarImage ? [sidebarImage.longitude, sidebarImage.latitude] : [-90.09497222222221, 29.981194444444444], // Initial map center [lng, lat]
-            zoom: 17, // Initial zoom level
+            zoom: 16, // Initial zoom level
             pitch: 76,
             bearing: 76,
         });
