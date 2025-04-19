@@ -158,7 +158,7 @@ const QueryPage = () => {
     let condition = filters.condition.toLowerCase();
     const location = filters.location;
 
-    let filteredPoles;
+    let filteredPoles = allPoles;
 
     if (assetType === "overall" && condition === "any") {
       filteredPoles = allPoles;
@@ -166,7 +166,7 @@ const QueryPage = () => {
       filteredPoles = allPoles.filter((pole) => pole.status === condition);
     } else if (condition === "any") {
       filteredPoles = allPoles;
-    } else {
+    } else if (assetType && condition) {
       filteredPoles = allPoles.filter(
           (pole) =>
               pole.components[assetType] &&
