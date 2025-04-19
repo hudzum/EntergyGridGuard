@@ -2,7 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -12,17 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import {PoleInfoPopup} from '@/components/PoleInfoPopup';
 import {
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {useEffect, useLayoutEffect, useRef} from "react";
 
 const getConditionColor = (condition: string) => {
   switch (condition.toLowerCase()) {
@@ -62,6 +55,8 @@ export type Pole = {
     'fault indicators'?: ComponentDetails;
   };
   thumbnail?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 const createComponentColumn = (componentName: keyof Pole['components']) => ({
@@ -189,67 +184,7 @@ export const columns: ColumnDef<Pole>[] = [
               <DialogTrigger asChild>
                 <span className="">View Image details</span>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl ">
-                <DialogHeader>
-                  <DialogTitle>Component Status for Pole #{pole.id}</DialogTitle>
-                  <DialogDescription>
-                    Detailed overview of all components and their current status.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <Card className="w-full shadow">
-                  <CardTitle className="text-xl font-bold text-center">
-                    Components Status Pole #{pole.id}
-                  </CardTitle>
-
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-2 gap-2">
-                      <img src={`/api/images/${pole.id}/data`} style={{width: '100%', height: '100%'}}/>
-                      <div style={{position: 'relative', width: '100%', height: '100%'}}>
-                        <img src={`/api/images/${pole.id}/data`} />
-                        <p style={{top: 0, left: 0, width: '100%', lineHeight: '12px', textTransform: 'capitalize', height: '100%', position: 'absolute', padding: 5, color: 'orange', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000', fontWeight: 'bold'}}>
-                          {Object.entries(pole.components).filter(([, data]) => data.quantity > 0).map(([name, data]) => (
-                              <>
-                                <span style={{margin: 0, }}>{name} ({data.quantity}) - </span>
-                                <span style={{margin: 0, color: ({bad: 'oklch(0.637 0.237 25.331)', good: 'oklch(0.723 0.219 149.579)', unknown: 'oklch(0.551 0.027 264.364)'}[data.condition] ?? 'white')}}>{data.condition}</span>
-                                <br />
-                                <span style={{margin: '0 0 0 20px', fontSize: 8}}>{data.description}</span>
-                                <br />
-                              </>
-                          ))}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {pole.components && Object.entries(pole.components).map(([name, data]) => (
-                        <Card key={name} className="overflow-hidden">
-                          <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
-                            <h3 className="font-medium capitalize">{name}</h3>
-                            <Badge className={getConditionColor(data.condition)}>
-                              {data.condition}
-                            </Badge>
-                          </div>
-                          <div className="p-4 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-500">Quantity:</span>
-                              <span className="font-semibold">{data.quantity}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-500">Description:</span>
-                              <span className="text-sm mt-1">{data.description}</span>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <DialogFooter>
-                  <Button type="button">Close</Button>
-                  <Button type="button" variant="outline">Generate Report</Button>
-                </DialogFooter>
-              </DialogContent>
+              <PoleInfoPopup pole={pole} />
             </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>

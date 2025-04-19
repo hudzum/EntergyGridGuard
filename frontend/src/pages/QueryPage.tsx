@@ -28,6 +28,8 @@ const QueryPage = () => {
     date: string;
     components: {}; // This can be an empty object if no components are provided
     thumbnail?: string; // Optional thumbnail for hover
+    latitude?: number | null;
+    longitude?: number | null;
   };
 
   const [allPoles, setAllPoles] = useState<Pole[]>([]); // All poles
@@ -88,6 +90,9 @@ const QueryPage = () => {
                 date: pole.time_created,
                 components: pole.components || {}, // Ensure components is always an object
                 thumbnail: pole.thumbnail || undefined, // Placeholder
+                latitude: pole.latitude || null,
+                // todo same hack as in other place
+                longitude: pole.longitude && -Math.abs(pole.longitude) || pole.longitude || null,
               };
               return newPole;
             });
