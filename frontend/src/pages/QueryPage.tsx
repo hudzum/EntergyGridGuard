@@ -1,25 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Navbar } from "@/components/NavBar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { DataTable } from "@/components/tableFilterComps/data-table";
-import { columns } from "@/components/tableFilterComps/columns";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Car } from "lucide-react";
+import React, {useEffect, useState} from "react";
+import {Navbar} from "@/components/NavBar";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {DataTable} from "@/components/tableFilterComps/data-table";
+import {columns} from "@/components/tableFilterComps/columns";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Button} from "@/components/ui/button";
 
 const QueryPage = () => {
   type Pole = {
@@ -42,7 +27,7 @@ const QueryPage = () => {
     condition: "",
     minPrice: "",
     maxPrice: "",
-    location: [],
+    location: '',
   });
 
   const [hoveredPoleId, setHoveredPoleId] = useState<number | null>(null);
@@ -171,21 +156,31 @@ const QueryPage = () => {
     console.log("Filters Applied:", filters);
     let assetType = filters.assetType.toLowerCase();
     let condition = filters.condition.toLowerCase();
+    const location = filters.location;
+
+    let filteredPoles;
+
     if (assetType === "overall" && condition === "any") {
-      setPoles(allPoles);
+      filteredPoles = allPoles;
     } else if (assetType === "overall") {
-      const newPoles = allPoles.filter((pole) => pole.status === condition);
-      setPoles(newPoles);
+      filteredPoles = allPoles.filter((pole) => pole.status === condition);
     } else if (condition === "any") {
-      setPoles(allPoles);
+      filteredPoles = allPoles;
     } else {
-      const newPoles = allPoles.filter(
-        (pole) =>
-          pole.components[assetType] &&
-          pole.components[assetType].condition === condition
+      filteredPoles = allPoles.filter(
+          (pole) =>
+              pole.components[assetType] &&
+              pole.components[assetType].condition === condition
       );
-      setPoles(newPoles);
     }
+
+    if (location === 'Has Location') {
+      filteredPoles = filteredPoles.filter((pole) => pole.latitude && pole.longitude);
+    } else if (location === 'No Location') {
+      filteredPoles = filteredPoles.filter((pole) => !(pole.latitude || pole.longitude));
+    }
+
+    setPoles(filteredPoles);
 
     const element = document.querySelector("#results");
 
@@ -202,12 +197,12 @@ const QueryPage = () => {
           <h2 className="text-2xl font-semibold">Utility Pole Inventory</h2>
 
           {/*Search/Filter by Assets Section */}
-          <Card className="flex flex-col shadow-lg bg-zinc-50 text-black border-1 border-rose-500 p-2 ml-10 w-4/12">
-            <CardContent className="p-4 space-y-4 text-black">
+          <Card style={{width: 'max-content'}} className="flex flex-col shadow-lg bg-zinc-50 text-black border-1 border-rose-500 p-2 ml-10 w-4/12">
+            <CardContent className="p-4 space-y-4 text-black" style={{width: 'max-content'}}>
               <h2 className="text-xl font-semibold">Search Assets</h2>
-              <div className="flex flex-row gap-4">
+              <div className="flex flex-row gap-4" style={{width: 'max-content'}}>
 
-                <div className = "flex-1">
+                <div>
                 <Select
                   onValueChange={(value) =>
                     handleSelectChange("assetType", value)
@@ -227,7 +222,7 @@ const QueryPage = () => {
                 </Select>
                 </div>
 
-                <div className ="flex-1">
+                <div>
                 <Select
                   onValueChange={(value) =>
                     handleSelectChange("condition", value)
@@ -245,12 +240,34 @@ const QueryPage = () => {
                   </SelectContent>
                 </Select>
               </div>
-                <Button
-                  className=" bg-rose-500 text-white flex-1"
-                  onClick={handleSearch}
-                >
-                  Search
-                </Button>
+
+                <div>
+                  <Select
+                      onValueChange={(value) =>
+                          handleSelectChange("location", value)
+                      }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['Has Location', 'No Location', 'Any'].map((cond) => (
+                          <SelectItem key={cond} value={cond}>
+                            {cond}
+                          </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Button
+                      className=" bg-rose-500 text-white flex-1"
+                      onClick={handleSearch}
+                  >
+                    Search
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

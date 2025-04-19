@@ -17,11 +17,11 @@ export const AttributionBox: React.FC = () => {
                 <div style={{padding: 10, display: 'flex', flexDirection: 'column'}}>
                     <span style={{textDecoration: 'underline'}}>Frontend Team</span>
                     <span>Muhammed Habibovic</span>
-                    <a href="https://mhabibovic.com" target="_blank">mhabibovic.com</a>
-                    <a href="mailto:muhammed@mhabibovic.com" target="_blank">muhammed@mhabibovic.com</a>
+                    <a style={{textDecoration: 'underline'}} href="https://mhabibovic.com" target="_blank">mhabibovic.com</a>
+                    <a style={{textDecoration: 'underline'}} href="mailto:muhammed@mhabibovic.com" target="_blank">muhammed@mhabibovic.com</a>
 
                     <span>Hudson Vu</span>
-                    <a href="mailto:hudsonvu2@gmail.com" target="_blank">hudsonvu2@gmail.com</a>
+                    <a style={{textDecoration: 'underline'}} href="mailto:hudsonvu2@gmail.com" target="_blank">hudsonvu2@gmail.com</a>
 
                     <span style={{textDecoration: 'underline'}}>Collaboration of the Entergy Student Team</span>
                     <span>Muhammed Habibovic, Hudson Vu, Lauren Bristol, Lakeidra Williams, Samuel Goodwin, Zachary Pham, Skylar Wilson</span>
