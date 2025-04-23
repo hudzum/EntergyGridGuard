@@ -32,6 +32,8 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 API_URL = os.getenv("AI_API_URL")
+AI_API_KEY = os.getenv("AI_API_KEY")
+AI_MODEL = os.getenv("AI_MODEL")
 
 API_ENDPOINT = "/analyze-image/"
 
@@ -120,7 +122,7 @@ def send_image(image_path):
 #         return response.json()
         client = OpenAI(
             base_url=API_URL,
-            api_key="sk-T8v95KvU5X4laJng0VoNPjmR4o7tNG8mPT4fS18ZV6fKWh62",
+            api_key=AI_API_KEY,
         )
         
         with open(image_path, "rb") as f:
@@ -129,7 +131,7 @@ def send_image(image_path):
         print('sending api request')
 
         response = client.chat.completions.create(
-            model="qwen2.5-vl-7b-instruct",
+            model=AI_MODEL,
             messages=[
                 {
                     "role": "user",
