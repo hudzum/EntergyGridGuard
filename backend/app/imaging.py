@@ -121,7 +121,6 @@ def send_image(image_path):
 #
 #         return response.json()
         client = OpenAI(
-            base_url=API_URL,
             api_key=AI_API_KEY,
         )
         
@@ -129,7 +128,7 @@ def send_image(image_path):
             image = base64.b64encode(f.read()).decode("utf-8")
 
         print('sending api request')
-
+        print(AI_MODEL)
         response = client.chat.completions.create(
             model=AI_MODEL,
             messages=[
@@ -137,167 +136,91 @@ def send_image(image_path):
                     "role": "user",
                     "content": [
                         {
+                            "type": "text",
+                            "text": '''Analyze the conditions of the following components of the power distribution infrastructure.
+
+                **You MUST follow these rules strictly:**
+                - **ONLY** check for the specified failure types listed below.
+                - If a failure condition is met the condition field for that component **MUST** be `"bad"`.
+                - The response **MUST** be in **valid JSON format** with **no additional text**.
+
+                **Components to identify:**
+                - **Pole(s)** → Vertical wooden structure(s) supporting electrical equipment.
+                    - Focus on poles directly related to the equipment in the foreground.
+                - **Crossarm(s)** → Horizontal wooden or fiberglass support structures mounted on the pole.
+                    - Each crossarm is counted separately, even if two are mounted in parallel.
+                    - Crossarms may be center mounted, meaning that the pole bisects the crossarm
+                    - Crossarms may be offset mounted, meaning that the crossarm extends from only one side of the pole.
+                - **Transformer(s)** → Cylindrical or box-like component(s) mounted on the pole that regulate voltage.
+                - **Primary Wires** → High-voltage power lines mounted **to crossarms via insulators**.
+                    - **Primary wires are THICKER than neutral wires** and are **always mounted on crossarms IF** crossarms are present.
+                    - **Do NOT confuse with neutral wires, which are thinner and mounted to the pole via ceramic spool insulators.**
+                - **Secondary Wires** → Lower voltage powerlines which supply power directly to customers.
+                    - Typically connected to a transformer to step down voltage before service delivery **IF** a transformer is present in the image.
+                    - **Often wound in a helix pattern.**
+                - **Neutral Wire** → A **thin wire** that acts as the return path for electricity back to a substation.
+                    - Mounted to the pole or a crossarm via a ceramic spool insulator.
+                    - Connects to the ground wire which is a thin copper wire running parallel to the pole into the ground.
+                - **Communication Cables** → **Thick, bundled cables** encased in **black rubber or plastic**, containing telephone, fiber optic, and cable TV lines.
+                    - Communication cables are **always the LOWEST wires** on the pole if present.
+                    - **They are NOT connected to transformers, insulators, or crossarms**.
+                    - **If a wire is bundled and runs below secondary wires, it is a communication cable.**
+                - **Guy Wires** → Diagonal steel cables that stabilize the pole.
+                    - Often encased in yellow plastic at the root of the wire.
+                    - Mounted to the pole and travel diagonally toward the ground.
+                - **Fuse Cutouts** → Insulated switches that protect transformers and other equipment from overcurrent conditions.
+                    - Consists of an insulator body and a hinge mechanism.
+                    - **Rectangular in shape**.
+                - **Street Lights** → Ovular or circular light fixtures mounted to the pole for road illumination.
+                    - **ONLY** consider street lights mounted to the power distribution pole.
+                    - **Do NOT confuse ovular or circular street lights with rectangular customer night lights.**
+                - **Customer Night Lights** → Rectangular light fixtures mounted to the pole for illumination.
+                    - **Do NOT confuse rectangular customer night lights with ovular street lights.**
+                - **Insulators** → Ceramic or composite devices used to **separate electrical wires from the pole**.
+                    - Insulators can take many shapes. They are best identified by their function, which is to mount electrical wires to poles or crossarms.
+                - **Capacitors** → Box-like components mounted to the pole.
+                    - Often appear in banks of three. Count these as **THREE** separate capacitors.
+                    - Often mounted on the upper third of the pole.
+                - **Fault Indicators** → Spherical light structures installed on primary wires to indicate a fault in distribution.
+                - **Lightning Arresters** → Pointed cylindrical components mounted to the top of a transformer to protect components from surges.
+                    - Often covered by an animal guard, which is a protective plastic cover to prevent wildlife tampering.
+                    - The body under the animal guard is ribbed in appearance.
+                    - Facilitate a connection between a **fuse cutout, secondary, or service wire** and the **transformer**.
+
+                **Failure types to check for each component:**
+                - **Pole** → Severe rot, lean of > 30 degrees, or breakage.
+                - **Crossarms** → Severe rot or breakage.
+                - **Transformers** → Charring, or active fire.
+                - **Primary Wires** → Disconnection, or severe tangling/fraying.
+                - **Secondary Wires** → Disconnection, or severe tangling/fraying.
+                - **Neutral Wires** → Disconnection, or severe tangling/fraying.
+                - **Communication Cables** → Disconnection, or severe tangling/fraying.
+                - **Guy Wires** → Disconnection or lack of tension.
+                - **Fuse Cutouts** → Disconnection.
+                - **Street Lights** → Broken glass.
+                - **Customer Night Lights** → Broken glass.
+                - **Insulators** → Disconnection.
+                - **Capacitors** → Charring.
+                - **Fault Indicators** → Broken glass or bulb.
+                - **Lightning Arresters** → Disconnection, or dismounted animal guard.
+
+                **Output Format (MUST follow exactly):**
+                ```json
+                {
+                    "component": {
+                        "quantity": <integer>,  
+                        "condition": "<good | bad | unknown>",
+                        "description": "<string>"
+                    }
+                }
+                ```
+                '''
+                        },
+                
+                        {
                             "type": "image_url",
                             "image_url": {"url": f'data:image/jpeg;base64,{image}'}
                         },
-                        {
-                            "type": "text",
-                            "text": '''Analyze the conditions of the following components of the power distribution infrastructure.
-        
-                        **You MUST follow these rules strictly:**
-                        - **ONLY** check for the specified failure types listed below.
-                        - If a failure condition is met the condition field for that component **MUST** be `"bad"`.
-                        - The response **MUST** be in **valid JSON format** with **no additional text**.
-        
-                        **Components to identify:**
-                        - **Pole(s)** → Vertical wooden structure(s) supporting electrical equipment.
-                            - Focus on poles directly related to the equipment in the foreground.
-                        - **Crossarm(s)** → Horizontal wooden or fiberglass support structures mounted on the pole.
-                            - Each crossarm is counted separately, even if two are mounted in parallel.
-                            - Crossarms may be center mounted, meaning that the pole bisects the crossarm
-                            - Crossarms may be offset mounted, meaning that the crossarm extends from only one side of the pole.
-                        - **Transformer(s)** → Cylindrical or box-like component(s) mounted on the pole that regulate voltage.
-                        - **Primary Wires** → High-voltage power lines mounted **to crossarms via insulators**.
-                            - **Primary wires are THICKER than neutral wires** and are **always mounted on crossarms IF** crossarms are present.
-                            - **Do NOT confuse with neutral wires, which are thinner and mounted to the pole via ceramic spool insulators.**
-                        - **Secondary Wires** → Lower voltage powerlines which supply power directly to customers.
-                            - Typically connected to a transformer to step down voltage before service delivery **IF** a transformer is present in the image.
-                            - **Often wound in a helix pattern.**
-                        - **Service Wires** → Power lines that supply power to nearby buildings.
-                            - Characteristically similar to secondary wires (**Often wound in a helix pattern**).
-                            - Run from utility poles directly to buildings.
-                        - **Neutral Wire** → A **thin wire** that acts as the return path for electricity back to a substation.
-                            - Mounted to the pole or a crossarm via a ceramic spool insulator.
-                            - Connects to the ground wire which is a thin copper wire running parallel to the pole into the ground.
-                        - **Communication Cables** → **Thick, bundled cables** encased in **black rubber or plastic**, containing telephone, fiber optic, and cable TV lines.
-                            - Communication cables are **always the LOWEST wires** on the pole if present.
-                            - **They are NOT connected to transformers, insulators, or crossarms**.
-                            - **If a wire is bundled and runs below secondary wires, it is a communication cable.**
-                        - **Guy Wires** → Diagonal steel cables that stabilize the pole.
-                            - Often encased in yellow plastic at the root of the wire.
-                            - Mounted to the pole and travel diagonally toward the ground.
-                        - **Fuse Cutouts** → Insulated switches that protect transformers and other equipment from overcurrent conditions.
-                            - Consists of an insulator body and a hinge mechanism.
-                            - **Rectangular in shape**.
-                        - **Street Lights** → Ovular or circular light fixtures mounted to the pole for road illumination.
-                            - **ONLY** consider street lights mounted to the power distribution pole.
-                            - **Do NOT confuse ovular or circular street lights with rectangular customer night lights.**
-                        - **Customer Night Lights** → Rectangular light fixtures mounted to the pole for illumination.
-                            - **Do NOT confuse rectangular customer night lights with ovular street lights.**
-                        - **Insulators** → Ceramic or composite devices used to **separate electrical wires from the pole**.
-                            - Insulators can take many shapes. They are best identified by their function, which is to mount electrical wires to poles or crossarms.
-                        - **Capacitors** → Box-like components mounted to the pole.
-                            - Often appear in banks of three. Count these as **THREE** separate capacitors.
-                            - Often mounted on the upper third of the pole.
-                        - **Fault Indicators** → Spherical light structures installed on primary wires to indicate a fault in distribution.
-                        - **Lightning Arresters** → Pointed cylindrical components mounted to the top of a transformer to protect components from surges.
-                            - Often covered by an animal guard, which is a protective plastic cover to prevent wildlife tampering.
-                            - The body under the animal guard is ribbed in appearance.
-                            - Facilitate a connection between a **fuse cutout, secondary, or service wire** and the **transformer**.
-        
-                        **Failure types to check for each component:**
-                        - **Pole** → Severe rot, lean of > 30 degrees, or breakage.
-                        - **Crossarms** → Severe rot or breakage.
-                        - **Transformers** → Charring, or active fire.
-                        - **Primary Wires** → Disconnection, or severe tangling/fraying.
-                        - **Secondary Wires** → Disconnection, or severe tangling/fraying.
-                        - **Service Wires** → Disconnection, or severe tangling/fraying.
-                        - **Neutral Wires** → Disconnection, or severe tangling/fraying.
-                        - **Communication Cables** → Disconnection, or severe tangling/fraying.
-                        - **Guy Wires** → Disconnection or lack of tension.
-                        - **Fuse Cutouts** → Disconnection.
-                        - **Street Lights** → Broken glass.
-                        - **Customer Night Lights** → Broken glass.
-                        - **Insulators** → Disconnection.
-                        - **Capacitors** → Charring.
-                        - **Fault Indicators** → Broken glass or bulb.
-                        - **Lightning Arresters** → Disconnection, or dismounted animal guard.
-        
-                        **Output Format (JSON) (MUST follow exactly):**
-                        {
-                            "pole": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'leaning pole with visible rot')"
-                            },
-                            "crossarms": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'crossarm is broken on one side')"
-                            },
-                            "transformers": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'rust visible on casing')"
-                            },
-                            "primary wires": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'wires are frayed and tangled')"
-                            },
-                            "secondary wires": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'wires are frayed and tangled')"
-                            },
-                            "service wires": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'wires are frayed and tangled')"
-                            },
-                            "neutral wire": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'wires are frayed and tangled')"
-                            },
-                            "communication cables": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'wires are frayed and tangled')"
-                            },
-                            "guy wires": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'lack of tension in guy wire')"
-                            },
-                            "fuse cutout": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'wires are frayed and tangled')"
-                            },
-                            "street lights": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'broken glass on lamp cover')"
-                            },
-                            "customer night lights": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'broken glass on lamp cover')"
-                            },
-                            "insulators": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'insulator disconnected from mount')"
-                            },
-                            "capacitors": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'capacitor casing is charred')"
-                            },
-                            "fault indicators": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'fault indicator bulb is broken')"
-                            }
-                            "lightning arresters": {
-                                "quantity": <integer>,  
-                                "condition": "<good | bad | unknown>",
-                                "description": "<string> (e.g., 'fault indicator bulb is broken')"
-                            }
-                        }
-                        '''
-                        }
                     ]
                 }
             ]
